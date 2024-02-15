@@ -21,8 +21,6 @@ public partial class DblibraryContext : DbContext
 
     public virtual DbSet<Book> Books { get; set; }
 
-    public virtual DbSet<CategoriesBook> CategoriesBooks { get; set; }
-
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<Genre> Genres { get; set; }
@@ -52,6 +50,10 @@ public partial class DblibraryContext : DbContext
 
         modelBuilder.Entity<AuthorsBook>(entity =>
         {
+            entity.HasKey(e => new { e.AuthorId, e.BookId }).HasName("PK_AuthorsBooks_1");
+
+            entity.Property(e => e.BookId).ValueGeneratedOnAdd();
+
             entity.HasOne(d => d.Author).WithMany(p => p.AuthorsBooks)
                 .HasForeignKey(d => d.AuthorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -74,24 +76,29 @@ public partial class DblibraryContext : DbContext
                 .HasConstraintName("FK_Books_Publisher");
         });
 
-        modelBuilder.Entity<CategoriesBook>(entity =>
-        {
-            entity.HasOne(d => d.Book).WithMany(p => p.CategoriesBooks)
-                .HasForeignKey(d => d.BookId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_CategoriesBooks_Books");
-
-            entity.HasOne(d => d.Category).WithMany(p => p.CategoriesBooks)
-                .HasForeignKey(d => d.CategoryId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_CategoriesBooks_Categories");
-        });
-
         modelBuilder.Entity<Category>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Categories_1");
 
             entity.Property(e => e.CategoryName).HasMaxLength(50);
+
+            entity.HasMany(d => d.Books).WithMany(p => p.Categories)
+                .UsingEntity<Dictionary<string, object>>(
+                    "CategoriesBook",
+                    r => r.HasOne<Book>().WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_CategoriesBooks_Books"),
+                    l => l.HasOne<Category>().WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_CategoriesBooks_Categories"),
+                    j =>
+                    {
+                        j.HasKey("CategoryId", "BookId").HasName("PK_CategoriesBooks_1");
+                        j.ToTable("CategoriesBooks");
+                        j.IndexerProperty<int>("CategoryId").ValueGeneratedOnAdd();
+                    });
         });
 
         modelBuilder.Entity<Genre>(entity =>
@@ -103,6 +110,13 @@ public partial class DblibraryContext : DbContext
 
         modelBuilder.Entity<GenresBook>(entity =>
         {
+            entity.HasKey(e => new { e.GenreId, e.BookId }).HasName("PK_GenresBooks_1");
+
+            entity.Property(e => e.Test)
+                .HasMaxLength(10)
+                .IsFixedLength()
+                .HasColumnName("test");
+
             entity.HasOne(d => d.Book).WithMany(p => p.GenresBooks)
                 .HasForeignKey(d => d.BookId)
                 .OnDelete(DeleteBehavior.ClientSetNull)

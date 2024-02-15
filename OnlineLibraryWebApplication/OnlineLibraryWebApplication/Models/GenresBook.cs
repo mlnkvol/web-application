@@ -5,8 +5,6 @@ namespace OnlineLibraryWebApplication.Models;
 
 public partial class GenresBook
 {
-    public int Id { get; set; }
-
     public int GenreId { get; set; }
 
     public int BookId { get; set; }
