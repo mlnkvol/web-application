@@ -17,15 +17,15 @@ public partial class Book
 
     public byte[]? Image { get; set; }
 
-    public virtual ICollection<AuthorsBook> AuthorsBooks { get; set; } = new List<AuthorsBook>();
-
-    public virtual ICollection<GenresBook> GenresBooks { get; set; } = new List<GenresBook>();
-
     public virtual ICollection<Possession> Possessions { get; set; } = new List<Possession>();
 
     public virtual Publisher Publisher { get; set; } = null!;
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 
+    public virtual ICollection<Author> Authors { get; set; } = new List<Author>();
+
     public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
+
+    public virtual ICollection<Genre> Genres { get; set; } = new List<Genre>();
 }

@@ -9,5 +9,5 @@ public partial class Author
 
     public string Author1 { get; set; } = null!;
 
-    public virtual ICollection<AuthorsBook> AuthorsBooks { get; set; } = new List<AuthorsBook>();
+    public virtual ICollection<Book> Books { get; set; } = new List<Book>();
 }

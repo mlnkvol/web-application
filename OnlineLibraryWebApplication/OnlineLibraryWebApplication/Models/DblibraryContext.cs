@@ -17,15 +17,11 @@ public partial class DblibraryContext : DbContext
 
     public virtual DbSet<Author> Authors { get; set; }
 
-    public virtual DbSet<AuthorsBook> AuthorsBooks { get; set; }
-
     public virtual DbSet<Book> Books { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<Genre> Genres { get; set; }
-
-    public virtual DbSet<GenresBook> GenresBooks { get; set; }
 
     public virtual DbSet<Possession> Possessions { get; set; }
 
@@ -37,7 +33,7 @@ public partial class DblibraryContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server= Olya\\SQLEXPRESS; Database=DBLibrary; Trusted_Connection=True; TrustServerCertificate=True; ");
+        => optionsBuilder.UseSqlServer("Server=Olya\\SQLEXPRESS; Database=DBLibrary; Trusted_Connection=True; TrustServerCertificate=True; ");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,23 +42,23 @@ public partial class DblibraryContext : DbContext
             entity.Property(e => e.Author1)
                 .HasMaxLength(100)
                 .HasColumnName("Author");
-        });
 
-        modelBuilder.Entity<AuthorsBook>(entity =>
-        {
-            entity.HasKey(e => new { e.AuthorId, e.BookId }).HasName("PK_AuthorsBooks_1");
-
-            entity.Property(e => e.BookId).ValueGeneratedOnAdd();
-
-            entity.HasOne(d => d.Author).WithMany(p => p.AuthorsBooks)
-                .HasForeignKey(d => d.AuthorId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_AuthorsBooks_Authors");
-
-            entity.HasOne(d => d.Book).WithMany(p => p.AuthorsBooks)
-                .HasForeignKey(d => d.BookId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_AuthorsBooks_Books");
+            entity.HasMany(d => d.Books).WithMany(p => p.Authors)
+                .UsingEntity<Dictionary<string, object>>(
+                    "AuthorsBook",
+                    r => r.HasOne<Book>().WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_AuthorsBooks_Books"),
+                    l => l.HasOne<Author>().WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_AuthorsBooks_Authors"),
+                    j =>
+                    {
+                        j.HasKey("AuthorId", "BookId").HasName("PK_AuthorsBooks_1");
+                        j.ToTable("AuthorsBooks");
+                    });
         });
 
         modelBuilder.Entity<Book>(entity =>
@@ -97,7 +93,6 @@ public partial class DblibraryContext : DbContext
                     {
                         j.HasKey("CategoryId", "BookId").HasName("PK_CategoriesBooks_1");
                         j.ToTable("CategoriesBooks");
-                        j.IndexerProperty<int>("CategoryId").ValueGeneratedOnAdd();
                     });
         });
 
@@ -106,26 +101,23 @@ public partial class DblibraryContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK_Genres_1");
 
             entity.Property(e => e.GenreName).HasMaxLength(50);
-        });
 
-        modelBuilder.Entity<GenresBook>(entity =>
-        {
-            entity.HasKey(e => new { e.GenreId, e.BookId }).HasName("PK_GenresBooks_1");
-
-            entity.Property(e => e.Test)
-                .HasMaxLength(10)
-                .IsFixedLength()
-                .HasColumnName("test");
-
-            entity.HasOne(d => d.Book).WithMany(p => p.GenresBooks)
-                .HasForeignKey(d => d.BookId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_GenresBooks_Books");
-
-            entity.HasOne(d => d.Genre).WithMany(p => p.GenresBooks)
-                .HasForeignKey(d => d.GenreId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_GenresBooks_Genres");
+            entity.HasMany(d => d.Books).WithMany(p => p.Genres)
+                .UsingEntity<Dictionary<string, object>>(
+                    "GenresBook",
+                    r => r.HasOne<Book>().WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_GenresBooks_Books"),
+                    l => l.HasOne<Genre>().WithMany()
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_GenresBooks_Genres"),
+                    j =>
+                    {
+                        j.HasKey("GenreId", "BookId").HasName("PK_GenresBooks_1");
+                        j.ToTable("GenresBooks");
+                    });
         });
 
         modelBuilder.Entity<Possession>(entity =>
