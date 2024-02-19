@@ -12,4 +12,5 @@ public partial class CategoriesBook
     public virtual Book Book { get; set; } = null!;
 
     public virtual Category Category { get; set; } = null!;
+
 }

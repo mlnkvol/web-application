@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace OnlineLibraryWebApplication.Models;
 
@@ -7,14 +8,23 @@ public partial class Book
 {
     public int Id { get; set; }
 
+    [Display(Name = "Назва")]
+    [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     public string Title { get; set; } = null!;
 
+    [Display(Name = "Опис")]
+    [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     public string Description { get; set; } = null!;
 
+    [Display(Name = "Видавництво")]
+    [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     public int PublisherId { get; set; }
 
+    [Display(Name = "Рік публікації")]
+    [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     public int PublicationYear { get; set; }
 
+    [Display(Name = "Зображення")]
     public byte[]? Image { get; set; }
 
     public virtual ICollection<Possession> Possessions { get; set; } = new List<Possession>();
