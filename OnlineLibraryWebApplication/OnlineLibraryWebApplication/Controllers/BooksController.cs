@@ -19,17 +19,74 @@ namespace OnlineLibraryWebApplication.Controllers
         }
 
         // GET: Books
-        public async Task<IActionResult> Index(int? id, string? name)
+        public async Task<IActionResult> Index(int? id, string? name, string? filteredBy)
         {
-            if (id == null) return RedirectToAction("Categories", "Index");
-            //знаходження книжок за категорією
-            ViewBag.CategoryId = id;
-            ViewBag.CategoryName = name;
-            var booksByCategory = _context.Books.Where(b => b.Categories.Any(c => c.Id == id));
+            switch (filteredBy)
+            {
+                case ("categories"):
+                    //знаходження книжок за категорією
+                    ViewBag.CategoryId = id;
+                    ViewBag.CategoryName = name;
+                    ViewBag.PageTitle = "Книги за категорією" + " " + @ViewBag.CategoryName;
+                    var booksByCategory = _context.Books
+                        .Include(b => b.Publisher)
+                        .Include(b => b.Categories)
+                        .Include(b => b.Genres)
+                        .Include(b => b.Authors)
+                        .Where(b => b.Categories
+                        .Any(c => c.Id == id));
 
+                    return View(await booksByCategory.ToListAsync());
+                case ("publishers"):
+                    //знаходження книжок за видавництвом
+                    ViewBag.PublisherId = id;
+                    ViewBag.PublisherName = name;
+                    ViewBag.PageTitle = "Книги видавництва" + " " + @ViewBag.PublisherName;
+                    var booksByPublisher = _context.Books
+                        .Include(b => b.Publisher)
+                        .Include(b => b.Categories)
+                        .Include(b => b.Genres)
+                        .Include(b => b.Authors)
+                        .Where(b => b.PublisherId == id);
 
-            return View(await booksByCategory.ToListAsync());
+                    return View(await booksByPublisher.ToListAsync());
+                case ("genres"):
+                    //знаходження книжок за жанром
+                    ViewBag.GenreId = id;
+                    ViewBag.GenreName = name;
+                    ViewBag.PageTitle = "Книги за жанром" + " " + @ViewBag.GenreName;
+                    var booksByGenres = _context.Books
+                        .Where(b => b.Genres.Any(g => g.Id == id))
+                        .Include(b => b.Publisher)
+                        .Include(b => b.Categories)
+                        .Include(b => b.Genres)
+                        .Include(b => b.Authors);
+
+                    return View(await booksByGenres.ToListAsync());
+                case ("authors"):
+                    //знаходження книжок за автором
+                    ViewBag.AuthorId = id;
+                    ViewBag.Author1 = name;
+                    ViewBag.PageTitle = "Книги автора" + " " + @ViewBag.Author1;
+                    var booksByAuthors = _context.Books
+                        .Include(b => b.Publisher)
+                        .Include(b => b.Categories)
+                        .Include(b => b.Genres)
+                        .Include(b => b.Authors)
+                        .Where(b => b.Authors.Any(a => a.Id == id));
+
+                    return View(await booksByAuthors.ToListAsync());
+                default:
+                    ViewBag.PageTitle = "Усі книги";
+                    return View(await _context.Books
+                        .Include(b => b.Publisher)
+                        .Include(b => b.Categories)
+                        .Include(b => b.Genres)
+                        .Include(b => b.Authors)
+                        .ToListAsync());
+            }
         }
+
 
         // GET: Books/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -46,7 +103,6 @@ namespace OnlineLibraryWebApplication.Controllers
             {
                 return NotFound();
             }
-
             return View(book);
         }
 
@@ -58,7 +114,8 @@ namespace OnlineLibraryWebApplication.Controllers
         }
 
         // POST: Books/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        //
+        // from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -160,7 +217,6 @@ namespace OnlineLibraryWebApplication.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
         private bool BookExists(int id)
         {
             return _context.Books.Any(e => e.Id == id);

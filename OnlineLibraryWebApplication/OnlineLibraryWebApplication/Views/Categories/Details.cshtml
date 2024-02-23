@@ -1,13 +1,12 @@
 ﻿@model OnlineLibraryWebApplication.Models.Category
 
 @{
-    ViewData["Title"] = "Деталі про категорію";
+    ViewData["Title"] = Model.CategoryName;
 }
 
-<h1>Деталі</h1>
+<h1>@Model.CategoryName</h1>
 
 <div>
-    <h4>Категорія</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">

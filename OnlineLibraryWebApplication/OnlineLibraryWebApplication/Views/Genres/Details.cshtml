@@ -1,0 +1,23 @@
+﻿@model OnlineLibraryWebApplication.Models.Genre
+
+@{
+    ViewData["Title"] = Model.GenreName;
+}
+
+<h1>@Model.GenreName</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.GenreName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.GenreName)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Редагувати</a> |
+    <a asp-controller="Genres" asp-action="Index">Повернутися до списку</a>
+</div>

@@ -4,12 +4,12 @@
     ViewData["Title"] = "Книги за категорією";
 }
 
-<h1>Книги за категорією @ViewBag.CategoryName</h1>
+<h1>@ViewBag.PageTitle</h1>
 
 <p>
     @Html.ActionLink("Додати нову книгу", "Create", new {categoryId = ViewBag.CategoryId})
 </p>
-<table class="table">
+@* <table class="table">
     <thead>
         <tr>
             <th>
@@ -25,7 +25,7 @@
                 @Html.DisplayNameFor(model => model.Image)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Publisher)
+                @Html.DisplayNameFor(model => model.PublisherId)
             </th>
             <th></th>
         </tr>
@@ -43,10 +43,12 @@
                 @Html.DisplayFor(modelItem => item.PublicationYear)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Image)
+                <img src="data:image/jpg;base64,@Convert.ToBase64String(item.Image)" alt="Зображення" width="254" height="398">
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Publisher.Id)
+                <a href="@Url.Action("Index", "Books", new { id = item.PublisherId, name = item.PublisherName, filteredBy = "publishers" })">
+                  @item.PublisherName
+                </a>
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
@@ -56,4 +58,70 @@
         </tr>
 }
     </tbody>
-</table>
+</table> *@
+
+@foreach (var book in Model)
+{
+    <div class="card mb-3 custom-card" style="max-width: 900px;">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <img src="data:image/jpg;base64,@Convert.ToBase64String(book.Image)" alt="Зображення" width="254" height="398">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">@Html.DisplayFor(modelItem => book.Title)</h5>
+                    <p class="card-text card-description">@Html.Raw(book.Description.ToString().Substring(0, Math.Min(250, book.Description.Length))) ...</p>
+                    <p class="card-text additional-info">
+                        Видавництво:
+                        <a href="@Url.Action("Index", "Books", new { id = book.PublisherId, name = book.PublisherName, filteredBy = "publishers" })">
+                            <strong>@Html.DisplayFor(modelItem => book.Publisher.PublisherName)</strong>
+                        </a>
+                    </p>
+                    <p class="card-text additional-info">Рік видання: <strong>@Html.DisplayFor(modelItem => book.PublicationYear)</strong></p>
+                    <p class="card-text additional-info">
+                        Категорії:
+                        @foreach (var category in book.Categories)
+                        {
+                            <a href="@Url.Action("Index", "Books", new { id = category.Id, name = category.CategoryName, filteredBy = "categories" })">
+                                <strong>@category.CategoryName</strong>
+                            </a>
+                            @if (category != book.Categories.Last())
+                            {
+                                <span class="comma">, </span>
+                            }
+                        }
+                    </p>
+                    <p class="card-text additional-info">
+                        Жанри:
+                        @foreach (var genre in book.Genres)
+                        {
+                            <a href="@Url.Action("Index", "Books", new { id = genre.Id, name = genre.GenreName, filteredBy = "genres" })">
+                                <strong>@genre.GenreName</strong>
+                            </a>
+                            @if (genre != book.Genres.Last())
+                            {
+                                <span class="comma">, </span>
+                            }
+                        }
+                    </p>
+                    <p class="card-text additional-info">
+                        Автор(и):
+                        @foreach (var author in book.Authors)
+                        {
+                            <a href="@Url.Action("Index", "Books", new { id = author.Id, name = author.Author1, filteredBy = "authors" })">
+                                <strong>@author.Author1</strong>
+                            </a>
+                            @if (author != book.Authors.Last())
+                            {
+                                <span class="comma">, </span>
+                            }
+                        }
+                    </p>
+                </div>
+                <form asp-action="Details" asp-route-id="@book.Id" method="get" class="d-grid justify-content-start">
+                    <button type="submit" class="custom-button">Детальніше</button>
+                </form>
+            </div>
+        </div>
+    </div>
+}

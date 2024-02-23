@@ -28,8 +28,36 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Categories}/{action=Index}/{id?}");
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "books",
+        pattern: "books/{action=Index}/{id?}/{name?}",
+        defaults: new { controller = "Books" });
+
+    endpoints.MapControllerRoute(
+        name: "categories",
+        pattern: "{action=Index}/{id?}",
+        defaults: new { controller = "Categories" });
+
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller= Categories}/{action=Index}/{id?}");
+
+    endpoints.MapControllerRoute(
+        name: "publishers",
+        pattern: "{action=Index}/{id?}",
+        defaults: new { controller = "Publishers" });
+
+    endpoints.MapControllerRoute(
+        name: "genres",
+        pattern: "{action=Index}/{id?}",
+        defaults: new { controller = "Genres" });
+
+    endpoints.MapControllerRoute(
+        name: "authors",
+        pattern: "{action=Index}/{id?}",
+        defaults: new { controller = "Authors" });
+});
 
 app.Run();

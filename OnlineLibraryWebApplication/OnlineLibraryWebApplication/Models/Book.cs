@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OnlineLibraryWebApplication.Models;
 
@@ -30,6 +31,9 @@ public partial class Book
     public virtual ICollection<Possession> Possessions { get; set; } = new List<Possession>();
 
     public virtual Publisher Publisher { get; set; } = null!;
+
+    [NotMapped] // Це атрибут, щоб Entity Framework ігнорував цю властивість при створенні бази даних
+    public string PublisherName => Publisher?.PublisherName;
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 

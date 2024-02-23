@@ -9,22 +9,30 @@ using OnlineLibraryWebApplication.Models;
 
 namespace OnlineLibraryWebApplication.Controllers
 {
-    public class CategoriesController : Controller
+    public class PublishersController : Controller
     {
         private readonly DblibraryContext _context;
 
-        public CategoriesController(DblibraryContext context)
+        public PublishersController(DblibraryContext context)
         {
             _context = context;
         }
 
-        // GET: Categories
+        // GET: Publishers
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            var publishers = await _context.Publishers
+        .ToListAsync();
+
+            foreach (var publisher in publishers)
+            {
+                publisher.BookCount = await _context.Books
+                    .CountAsync(b => b.PublisherId == publisher.Id);
+            }
+            return View(await _context.Publishers.ToListAsync());
         }
 
-        // GET: Categories/Details/5
+        // GET: Publishers/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -32,40 +40,40 @@ namespace OnlineLibraryWebApplication.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var publisher = await _context.Publishers
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (publisher == null)
             {
                 return NotFound();
             }
 
-            // return View(category);
-            return RedirectToAction("Index", "Books", new { Id = category.Id, Name = category.CategoryName, filteredBy = "categories" });
+            // return View(Publisher);
+            return RedirectToAction("Index", "Books", new { Id = publisher.Id, Name = publisher.PublisherName, filteredBy = "publishers" });
         }
 
-        // GET: Categories/Create
+        // GET: Publishers/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Categories/Create
+        // POST: Publishers/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CategoryName")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,PublisherName")] Publisher publisher)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
+                _context.Add(publisher);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(publisher);
         }
 
-        // GET: Categories/Edit/5
+        // GET: Publishers/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +81,22 @@ namespace OnlineLibraryWebApplication.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var publisher = await _context.Publishers.FindAsync(id);
+            if (publisher == null)
             {
                 return NotFound();
             }
-            return View(category);
+            return View(publisher);
         }
 
-        // POST: Categories/Edit/5
+        // POST: Publishers/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CategoryName")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,PublisherName")] Publisher publisher)
         {
-            if (id != category.Id)
+            if (id != publisher.Id)
             {
                 return NotFound();
             }
@@ -97,12 +105,12 @@ namespace OnlineLibraryWebApplication.Controllers
             {
                 try
                 {
-                    _context.Update(category);
+                    _context.Update(publisher);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id))
+                    if (!PublisherExists(publisher.Id))
                     {
                         return NotFound();
                     }
@@ -113,10 +121,10 @@ namespace OnlineLibraryWebApplication.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(publisher);
         }
 
-        // GET: Categories/Delete/5
+        // GET: Publishers/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,34 +132,34 @@ namespace OnlineLibraryWebApplication.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var publisher = await _context.Publishers
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (publisher == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(publisher);
         }
 
-        // POST: Categories/Delete/5
+        // POST: Publishers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
+            var publisher = await _context.Publishers.FindAsync(id);
+            if (publisher != null)
             {
-                _context.Categories.Remove(category);
+                _context.Publishers.Remove(publisher);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private bool PublisherExists(int id)
         {
-            return _context.Categories.Any(e => e.Id == id);
+            return _context.Publishers.Any(e => e.Id == id);
         }
     }
 }
