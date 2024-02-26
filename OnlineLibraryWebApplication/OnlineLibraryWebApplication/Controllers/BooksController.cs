@@ -98,6 +98,9 @@ namespace OnlineLibraryWebApplication.Controllers
 
             var book = await _context.Books
                 .Include(b => b.Publisher)
+                .Include(b => b.Genres)
+                .Include(b => b.Categories)
+                .Include(b => b.Authors)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (book == null)
             {

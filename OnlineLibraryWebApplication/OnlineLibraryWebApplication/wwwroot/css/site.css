@@ -5,7 +5,8 @@ html
 
 @media (min-width: 768px) 
 {
-  html {
+  html 
+  {
     font-size: 16px;
   }
 }
@@ -43,25 +44,25 @@ body
 
 .custom-card 
 {
-    background-color: #F4EDFF; /* Світлий колір для карток */
+    background-color: #F4EDFF; 
     border: 2px solid #D4C6E7;
     border-radius: 20px;
     overflow: hidden;
-    transition: background-color 0.3s ease; /* Додано анімацію для плавного переходу кольору */
+    transition: background-color 0.3s ease; 
 }
 
 .custom-card:hover 
 {
-    background-color: #E5D8FF; /* Темніший колір для наведення */
+    background-color: #E5D8FF; 
 }
 
 .card-title 
 {
-    margin-bottom: 20px; /* Додано відстань між title та description */
+    margin-bottom: 20px; 
     color: #6F42C1;
-    font-size: 24px; /* Додано зміну розміру шрифта для заголовка */
-    border-bottom: 2px solid #D4C6E7; /* Додано пряму розділяючу лінію після заголовка */
-    padding-bottom: 10px; /* Додано відступ для розділяючої лінії */
+    font-size: 24px; 
+    border-bottom: 2px solid #D4C6E7; 
+    padding-bottom: 10px;
 }
 
 .additional-info 
@@ -73,17 +74,39 @@ body
 
 .additional-info a 
 {
-    color: #6F42C1; /* Колір посилання, такий самий, як у card-title */
-    text-decoration: none; /* Відсутність підкреслення для посилання */
+    color: #6F42C1; 
+    text-decoration: none;
 }
 
 .additional-info a:hover 
 {
-    color: #6F42C1; /* Колір посилання при наведенні, такий самий, як у card-title */
-    text-decoration: underline; /* Підкреслення при наведенні на посилання */
+    color: #6F42C1; 
+    text-decoration: underline; 
 }
 
-.badge-dark-purple {
+.badge-dark-purple 
+{
     background-color: #6F42C1;
     color: #ffffff;
+}
+
+.book-details-container 
+{
+    margin-top: 20px; 
+    margin-left: 30px;
+}
+
+#book-description 
+{
+    margin-top: 30px; 
+}
+
+#read-more {
+    color: #6F42C1;
+    cursor: pointer;
+}
+
+#read-more:hover 
+{
+    text-decoration: underline; 
 }

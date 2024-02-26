@@ -4,9 +4,9 @@
     ViewData["Title"] = Model.Title;
 }
 
-<h1>@Model.Title</h1>
+@*<h1>@Model.Title</h1>
 
-<div>
+ <div>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -47,3 +47,107 @@
     <a asp-action="Edit" asp-route-id="@Model?.Id">Редагувати</a> |
     <a href="javascript:window.history.back()">Повернутися до списку</a>
 </div>
+ *@
+<div class="container book-details-container">
+    <div class="row">
+        <div class="col-sm-6">
+            <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Image)" alt="Book Image" width="363" height="570"/>
+        </div>
+        <div class="col-sm-6 ml-3">
+            <h2 class="card-title">@Html.DisplayFor(modelItem => Model.Title)</h2>
+            <dl class="row">
+                <p class="card-text additional-info">
+                    Видавництво:
+                    <a href="@Url.Action("Index", "Books", new { id = Model.PublisherId, name = Model.PublisherName, filteredBy = "publishers" })">
+                        <strong>@Html.DisplayFor(modelItem => Model.Publisher.PublisherName)</strong>
+                    </a>
+                </p>
+                <div>
+                    <p class="card-text additional-info">Рік видання: <strong>@Html.DisplayFor(modelItem => Model.PublicationYear)</strong></p>
+                    <p class="card-text additional-info">
+                        Категорії:
+                        @foreach (var category in Model.Categories)
+                        {
+                            <a href="@Url.Action("Index", "Books", new { id = category.Id, name = category.CategoryName, filteredBy = "categories" })">
+                                <strong>@category.CategoryName</strong>
+                            </a>
+                            @if (category != Model.Categories.Last())
+                            {
+                                <span class="comma">, </span>
+                            }
+                        }
+                    </p>
+                    <p class="card-text additional-info">
+                        Жанри:
+                        @foreach (var genre in Model.Genres)
+                        {
+                            <a href="@Url.Action("Index", "Books", new { id = genre.Id, name = genre.GenreName, filteredBy = "genres" })">
+                                <strong>@genre.GenreName</strong>
+                            </a>
+                            @if (genre != Model.Genres.Last())
+                            {
+                                <span class="comma">, </span>
+                            }
+                        }
+                    </p>
+                    <p class="card-text additional-info">
+                        Автор(и):
+                        @foreach (var author in Model.Authors)
+                        {
+                            <a href="@Url.Action("Index", "Books", new { id = author.Id, name = author.Author1, filteredBy = "authors" })">
+                                <strong>@author.Author1</strong>
+                            </a>
+                            @if (author != Model.Authors.Last())
+                            {
+                                <span class="comma">, </span>
+                            }
+                        }
+                    </p>
+                    <p id="book-description" class="card-text additional-info">
+                        <strong>Анотація:</strong></br>
+                        @Html.Raw(Model.Description.ToString())
+                    </p>
+                    <p id="read-more" class="card-text additional-info read-more" onclick="toggleDescription()">Читати далі</p>
+                    <div class="buttons-container">
+                        <button class="custom-button mt-3" onclick="addToLibrary()">Додати до бібліотеки</button>
+                    </div>
+                </div>               
+            </dl>
+            <div class="row mt-3">
+                <div class="col-sm-12 text-center ml=20 mt=200">
+                <embed src="/pdfs/FromBloodAndAsh.pdf"
+                       type="application/pdf"
+                       frameBorder="0"
+                       scrolling="auto"
+                       height="700px" 
+                       width="600"></embed>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var maxLength = 250;
+    var description = document.getElementById('book-description');
+    var readMoreBtn = document.getElementById('read-more');
+    var fullText = description.innerHTML;
+
+    if (fullText.length > maxLength) {
+        var shortenedText = fullText.substring(0, maxLength) + '...';
+        description.innerHTML = shortenedText;
+        readMoreBtn.style.display = 'block';
+    } else {
+        readMoreBtn.style.display = 'none';
+    }
+
+    function toggleDescription() {
+        if (readMoreBtn.innerHTML === 'Читати далі') {
+            description.innerHTML = fullText;
+            readMoreBtn.innerHTML = 'Згорнути';
+        } else {
+            description.innerHTML = shortenedText;
+            readMoreBtn.innerHTML = 'Читати далі';
+        }
+    }
+</script>
