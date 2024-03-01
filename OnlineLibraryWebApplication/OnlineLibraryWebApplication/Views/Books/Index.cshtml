@@ -92,7 +92,7 @@
                         }
                     </p>
                     <p class="card-text additional-info">
-                        Жанри:
+                        Жанр(и):
                         @foreach (var genre in book.Genres)
                         {
                             <a href="@Url.Action("Index", "Books", new { id = genre.Id, name = genre.GenreName, filteredBy = "genres" })">

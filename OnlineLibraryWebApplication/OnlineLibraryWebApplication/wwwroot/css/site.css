@@ -22,9 +22,13 @@ html
   min-height: 100%;
 }
 
-body 
-{
-  margin-bottom: 60px;
+body {
+    margin-bottom: 60px;
+    transition: background-color 0.5s ease;
+}
+
+.pastel-background {
+    background-color: #e6d8f5;
 }
 
 .custom-button 
@@ -109,4 +113,66 @@ body
 #read-more:hover 
 {
     text-decoration: underline; 
+}
+
+#reviewsCarousel {
+    background-color: white; /* Білий задній фон */
+    border-radius: 15px; /* Закруглені краї контейнера */
+    padding: 20px; /* Відступи від країв блоку */
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: #B19CD9; /* Колір стрілок Next і Previous */
+    border-radius: 50%; /* Закруглення стрілок */
+}
+
+.carousel-item {
+    background-color: white; /* Білий задній фон окремого відгуку */
+    color: #6E6893; /* Колір тексту відгуку */
+    border-radius: 15px; /* Закруглені краї окремого відгуку */
+    padding: 20px; /* Відступи від країв окремого відгуку */
+}
+
+.review-item strong {
+    color: #B19CD9; /* Колір імені користувача (жирний текст) */
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    background-color: #B19CD9;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 0px;
+    opacity: 1;
+}
+
+.carousel-control-prev {
+    left: -15px;
+}
+
+.carousel-control-next {
+    right: -15px;
+}
+
+.carousel-inner {
+    z-index: 1;
+}
+
+.custom-header {
+    background-color: #B19CD9; 
+    color: #fff; 
+}
+
+.navbar-nav .nav-link.active {
+    border-bottom: 2px solid #6F42C1; 
+}
+
+h1 {
+    font-weight: bold;
+    color: #6F42C1; 
 }

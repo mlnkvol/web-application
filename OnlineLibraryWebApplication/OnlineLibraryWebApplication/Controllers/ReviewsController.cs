@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,29 +10,27 @@ using OnlineLibraryWebApplication.Models;
 
 namespace OnlineLibraryWebApplication.Controllers
 {
-    public class AuthorsController : Controller
+    public class ReviewsController : Controller
     {
         private readonly DblibraryContext _context;
 
-        public AuthorsController(DblibraryContext context)
+        public ReviewsController(DblibraryContext context)
         {
             _context = context;
         }
 
-        // GET: Authors
-        public async Task<IActionResult> Index()
+        // GET: Reviews
+        public async Task<IActionResult> Index(int bookId)
         {
-            var authors = await _context.Authors.ToListAsync();
+            var reviews = _context.Reviews
+                .Where(r => r.BookId == bookId)
+                .Include(r => r.Book)
+                .Include(r => r.User);
 
-            foreach (var author in authors)
-            {
-                author.BookCount = _context.Books
-                    .Count(b => b.Authors.Any(c => c.Id == author.Id));
-            }
-            return View(await _context.Authors.ToListAsync());
+            return View(await reviews.ToListAsync());
         }
 
-        // GET: Authors/Details/5
+        // GET: Reviews/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -39,39 +38,47 @@ namespace OnlineLibraryWebApplication.Controllers
                 return NotFound();
             }
 
-            var author = await _context.Authors
+            var review = await _context.Reviews
+                .Include(r => r.Book)
+                .Include(r => r.User)
+                .Include(r => r.Rating)
+                .Include(r => r.Date)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (author == null)
+            if (review == null)
             {
                 return NotFound();
             }
 
-            return View(author);
+            return View(review);
         }
 
-        // GET: Authors/Create
+        // GET: Reviews/Create
         public IActionResult Create()
         {
+            ViewData["BookId"] = new SelectList(_context.Books, "Id", "Description");
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
-        // POST: Authors/Create
+        // POST: Reviews/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Author1")] Author author)
+        public async Task<IActionResult> Create([Bind("Id,UserId,BookId,Rating,Comment,Date")] Review review)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(author);
+                _context.Add(review);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(author);
+            ViewData["BookId"] = new SelectList(_context.Books, "Id", "Description", review.BookId);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", review.UserId);
+            return View(review);
         }
 
-        // GET: Authors/Edit/5
+        // GET: Reviews/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -79,22 +86,24 @@ namespace OnlineLibraryWebApplication.Controllers
                 return NotFound();
             }
 
-            var author = await _context.Authors.FindAsync(id);
-            if (author == null)
+            var review = await _context.Reviews.FindAsync(id);
+            if (review == null)
             {
                 return NotFound();
             }
-            return View(author);
+            ViewData["BookId"] = new SelectList(_context.Books, "Id", "Description", review.BookId);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", review.UserId);
+            return View(review);
         }
 
-        // POST: Authors/Edit/5
+        // POST: Reviews/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Author1")] Author author)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,BookId,Rating,Comment,Date")] Review review)
         {
-            if (id != author.Id)
+            if (id != review.Id)
             {
                 return NotFound();
             }
@@ -103,12 +112,12 @@ namespace OnlineLibraryWebApplication.Controllers
             {
                 try
                 {
-                    _context.Update(author);
+                    _context.Update(review);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AuthorExists(author.Id))
+                    if (!ReviewExists(review.Id))
                     {
                         return NotFound();
                     }
@@ -119,10 +128,12 @@ namespace OnlineLibraryWebApplication.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(author);
+            ViewData["BookId"] = new SelectList(_context.Books, "Id", "Description", review.BookId);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", review.UserId);
+            return View(review);
         }
 
-        // GET: Authors/Delete/5
+        // GET: Reviews/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -130,34 +141,36 @@ namespace OnlineLibraryWebApplication.Controllers
                 return NotFound();
             }
 
-            var author = await _context.Authors
+            var review = await _context.Reviews
+                .Include(r => r.Book)
+                .Include(r => r.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (author == null)
+            if (review == null)
             {
                 return NotFound();
             }
 
-            return View(author);
+            return View(review);
         }
 
-        // POST: Authors/Delete/5
+        // POST: Reviews/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var author = await _context.Authors.FindAsync(id);
-            if (author != null)
+            var review = await _context.Reviews.FindAsync(id);
+            if (review != null)
             {
-                _context.Authors.Remove(author);
+                _context.Reviews.Remove(review);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AuthorExists(int id)
+        private bool ReviewExists(int id)
         {
-            return _context.Authors.Any(e => e.Id == id);
+            return _context.Reviews.Any(e => e.Id == id);
         }
     }
 }

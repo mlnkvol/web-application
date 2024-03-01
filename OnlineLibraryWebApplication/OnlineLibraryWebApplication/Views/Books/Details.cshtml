@@ -4,6 +4,9 @@
     ViewData["Title"] = Model.Title;
 }
 
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 @*<h1>@Model.Title</h1>
 
  <div>
@@ -48,10 +51,11 @@
     <a href="javascript:window.history.back()">Повернутися до списку</a>
 </div>
  *@
+
 <div class="container book-details-container">
     <div class="row">
         <div class="col-sm-6">
-            <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Image)" alt="Book Image" width="363" height="570"/>
+            <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Image)" alt="Book Image" width="363" height="570" />
         </div>
         <div class="col-sm-6 ml-3">
             <h2 class="card-title">@Html.DisplayFor(modelItem => Model.Title)</h2>
@@ -113,41 +117,98 @@
                     </div>
                 </div>               
             </dl>
-            <div class="row mt-3">
-                <div class="col-sm-12 text-center ml=20 mt=200">
-                <embed src="/pdfs/FromBloodAndAsh.pdf"
-                       type="application/pdf"
-                       frameBorder="0"
-                       scrolling="auto"
-                       height="700px" 
-                       width="600"></embed>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <embed src="/pdfs/@(System.Net.WebUtility.UrlEncode(Model.Title).Replace( "+", "%20").Replace("%22", "%27")).pdf"
+                   type="application/pdf"
+                   frameBorder="0"
+                   scrolling="auto"
+                   height="700px"
+                   width="600"></embed>
+        </div>
+        <div class="col-sm-6 ml-3 mt-4 d-flex align-items-center">
+            <div class="d-flex flex-column align-items-center justify-content-center">
+                <h3 class="mb-4" style="color: #6F42C1;">Відгуки</h3>
+
+                <div id="reviewsCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+                    <div class="carousel-inner">
+                        @if (Model.Reviews != null && Model.Reviews.Any())
+                        {
+                            var isFirst = true;
+                            foreach (var review in Model.Reviews)
+                            {
+                                <div class="carousel-item @(isFirst ? "active" : "")">
+                                    <div class="review-item">
+                                        <p class="mb-0">
+                                            @if (review.User != null)
+                                            {
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="user-name" style="color: #6F42C1; font-size: 18px;"><strong>@review.User.Name</strong></span>
+                                                    <span class="text-warning">@review.StarsForRating()</span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="user-name" style="color: #6F42C1; font-size: 18px;"><strong>Анонімний користувач</strong></span>
+                                                    <span class="text-warning">@review.StarsForRating()</span>
+                                                </div>
+                                            }
+
+                                            @if (!string.IsNullOrEmpty(review.Comment))
+                                            {
+                                                <br />
+                                                <div>
+                                                    @review.Comment
+                                                    <br />
+                                                    <div class="mt-2">
+                                                        <span class="text-muted">@review.Date.ToString("yyyy-MM-dd")</span>
+                                                    </div>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                            <p>Без коментаря</p>
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                                isFirst = false;
+                            }
+                        }
+                        else
+                        {
+                            <p>На жаль, поки немає відгуків для цієї книги.</p>
+                        }
+                    </div>
+                    <a class="carousel-control-prev" href="#reviewsCarousel" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#reviewsCarousel" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
                 </div>
             </div>
         </div>
+
     </div>
+    <form action="/Reviews/AddReview" method="post" class="mt-4" style="width: 50%; border-radius: 15px; padding: 20px; background-color: #F4EDFF; margin: 0 auto;">
+        <div class="form-group">
+            <label for="userName" style="color: #6F42C1; font-weight: bold;">Ім'я</label>
+            <input type="text" class="form-control" id="userName" name="userName" required>
+        </div>
+        <div class="form-group">
+            <label for="rating" style="color: #6F42C1; font-weight: bold;">Оцінка (від 1 до 5)</label>
+            <input type="number" class="form-control" id="rating" name="rating" min="1" max="5" required>
+        </div>
+        <div class="form-group">
+            <label for="comment" style="color: #6F42C1; font-weight: bold;">Коментар</label>
+            <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="custom-button mt-3">Додати відгук</button>
+    </form>
 </div>
-
-<script>
-    var maxLength = 250;
-    var description = document.getElementById('book-description');
-    var readMoreBtn = document.getElementById('read-more');
-    var fullText = description.innerHTML;
-
-    if (fullText.length > maxLength) {
-        var shortenedText = fullText.substring(0, maxLength) + '...';
-        description.innerHTML = shortenedText;
-        readMoreBtn.style.display = 'block';
-    } else {
-        readMoreBtn.style.display = 'none';
-    }
-
-    function toggleDescription() {
-        if (readMoreBtn.innerHTML === 'Читати далі') {
-            description.innerHTML = fullText;
-            readMoreBtn.innerHTML = 'Згорнути';
-        } else {
-            description.innerHTML = shortenedText;
-            readMoreBtn.innerHTML = 'Читати далі';
-        }
-    }
-</script>

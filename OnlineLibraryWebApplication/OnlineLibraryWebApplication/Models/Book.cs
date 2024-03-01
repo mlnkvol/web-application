@@ -28,17 +28,6 @@ public partial class Book
     [Display(Name = "Зображення")]
     public byte[]? Image { get; set; }
 
-    [NotMapped]
-    public string PdfFilePath => $"/pdfs/{SanitizeFileName(Title)}.pdf";
-
-    private string SanitizeFileName(string fileName)
-    {
-        // Видалення пробілів та інших недопустимих символів у назві файлу
-        return new string(fileName
-            .Where(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c))
-            .ToArray());
-    }
-
     public virtual ICollection<Possession> Possessions { get; set; } = new List<Possession>();
 
     public virtual Publisher Publisher { get; set; } = null!;

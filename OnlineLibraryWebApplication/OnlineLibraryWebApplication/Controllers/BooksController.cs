@@ -77,7 +77,7 @@ namespace OnlineLibraryWebApplication.Controllers
 
                     return View(await booksByAuthors.ToListAsync());
                 default:
-                    ViewBag.PageTitle = "Усі книги";
+                    ViewBag.PageTitle = "Всі книги";
                     return View(await _context.Books
                         .Include(b => b.Publisher)
                         .Include(b => b.Categories)
@@ -101,6 +101,8 @@ namespace OnlineLibraryWebApplication.Controllers
                 .Include(b => b.Genres)
                 .Include(b => b.Categories)
                 .Include(b => b.Authors)
+                .Include(b => b.Reviews)
+                .ThenInclude(r => r.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (book == null)
             {

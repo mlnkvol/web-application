@@ -9,29 +9,22 @@ using OnlineLibraryWebApplication.Models;
 
 namespace OnlineLibraryWebApplication.Controllers
 {
-    public class AuthorsController : Controller
+    public class UsersController : Controller
     {
         private readonly DblibraryContext _context;
 
-        public AuthorsController(DblibraryContext context)
+        public UsersController(DblibraryContext context)
         {
             _context = context;
         }
 
-        // GET: Authors
+        // GET: Users
         public async Task<IActionResult> Index()
         {
-            var authors = await _context.Authors.ToListAsync();
-
-            foreach (var author in authors)
-            {
-                author.BookCount = _context.Books
-                    .Count(b => b.Authors.Any(c => c.Id == author.Id));
-            }
-            return View(await _context.Authors.ToListAsync());
+            return View(await _context.Users.ToListAsync());
         }
 
-        // GET: Authors/Details/5
+        // GET: Users/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -39,39 +32,39 @@ namespace OnlineLibraryWebApplication.Controllers
                 return NotFound();
             }
 
-            var author = await _context.Authors
+            var user = await _context.Users
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (author == null)
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return View(author);
+            return View(user);
         }
 
-        // GET: Authors/Create
+        // GET: Users/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Authors/Create
+        // POST: Users/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Author1")] Author author)
+        public async Task<IActionResult> Create([Bind("Id,Name,BirthDate")] User user)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(author);
+                _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(author);
+            return View(user);
         }
 
-        // GET: Authors/Edit/5
+        // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -79,22 +72,22 @@ namespace OnlineLibraryWebApplication.Controllers
                 return NotFound();
             }
 
-            var author = await _context.Authors.FindAsync(id);
-            if (author == null)
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
-            return View(author);
+            return View(user);
         }
 
-        // POST: Authors/Edit/5
+        // POST: Users/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Author1")] Author author)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,BirthDate")] User user)
         {
-            if (id != author.Id)
+            if (id != user.Id)
             {
                 return NotFound();
             }
@@ -103,12 +96,12 @@ namespace OnlineLibraryWebApplication.Controllers
             {
                 try
                 {
-                    _context.Update(author);
+                    _context.Update(user);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AuthorExists(author.Id))
+                    if (!UserExists(user.Id))
                     {
                         return NotFound();
                     }
@@ -119,10 +112,10 @@ namespace OnlineLibraryWebApplication.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(author);
+            return View(user);
         }
 
-        // GET: Authors/Delete/5
+        // GET: Users/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -130,34 +123,34 @@ namespace OnlineLibraryWebApplication.Controllers
                 return NotFound();
             }
 
-            var author = await _context.Authors
+            var user = await _context.Users
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (author == null)
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return View(author);
+            return View(user);
         }
 
-        // POST: Authors/Delete/5
+        // POST: Users/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var author = await _context.Authors.FindAsync(id);
-            if (author != null)
+            var user = await _context.Users.FindAsync(id);
+            if (user != null)
             {
-                _context.Authors.Remove(author);
+                _context.Users.Remove(user);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AuthorExists(int id)
+        private bool UserExists(int id)
         {
-            return _context.Authors.Any(e => e.Id == id);
+            return _context.Users.Any(e => e.Id == id);
         }
     }
 }
