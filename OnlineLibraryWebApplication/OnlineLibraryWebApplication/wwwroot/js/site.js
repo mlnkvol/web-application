@@ -43,3 +43,18 @@ $(document).ready(function () {
         interval: false
     });
 });
+
+function addToLibrary() {
+    var bookId = $("#bookId").val();
+
+    $.ajax({
+        url: "/Possessions/AddToLibrary/" + bookId,
+        type: "POST",
+        success: function () {
+            alert("Книга додана до бібліотеки!");
+        },
+        error: function () {
+            alert("Помилка під час додавання до бібліотеки.");
+        }
+    });
+}

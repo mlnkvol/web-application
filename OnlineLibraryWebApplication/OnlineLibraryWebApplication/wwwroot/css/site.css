@@ -176,3 +176,46 @@ h1 {
     font-weight: bold;
     color: #6F42C1; 
 }
+
+.custom-card-category {
+    background-color: #F4EDFF;
+    border: 2px solid #D4C6E7;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+}
+
+    .custom-card-category:hover {
+        background-color: #E5D8FF;
+    }
+
+    .custom-card-category .card-img-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .custom-card-category .card-img-top {
+        width: 100%;
+        height: 350px; 
+        object-fit: cover;
+    }
+
+    .custom-card-category .card-body {
+        text-align: center;
+        padding: 10px; 
+    }
+
+    .custom-card-category .card-title {
+        margin: 0;
+        color: #6F42C1;
+        font-size: 20px;
+        border-bottom: none;
+        padding-bottom: 5px; 
+        text-decoration: none;
+        display: block;
+    }
+
+    .custom-card-category:hover {
+        background-color: #E5D8FF;
+    }

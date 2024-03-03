@@ -6,10 +6,10 @@
 
 <h1>Список авторів</h1>
 
-<p>
+@*<p>
     <a asp-action="Create">Додати нового автора</a>
 </p>
-@* <table class="table">
+ <table class="table">
     <thead>
         <tr>
             <th>
@@ -34,12 +34,25 @@
     </tbody>
 </table> *@
 
-<div class="list-group">
+@* <div class="list-group">
     @foreach (var author in Model)
     {
         <a href="@Url.Action("Index", "Books", new { Id = author.Id, Name = author.Author1, filteredBy = "authors" })" class="list-group-item list-group-item-action custom-card d-flex justify-content-between align-items-center">
             <h5 class="card-title">@Html.DisplayFor(modelItem => author.Author1)</h5>
             <span class="badge rounded-pill badge-dark-purple">@author.BookCount</span>
         </a>
+    }
+</div> *@
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    @foreach (var author in Model)
+    {
+        <div class="col">
+            <a href="@Url.Action("Index", "Books", new { Id = author.Id, Name = author.Author1, filteredBy = "authors" })" class="card custom-card-category">
+                <img src="@Url.Content($"~/pictures/{author.Author1}.jpg")" class="card-img-top" alt="Картинка автора">
+                <div class="card-body">
+                    <h5 class="card-title">@Html.DisplayFor(modelItem => author.Author1)</h5>
+                </div>
+            </a>
+        </div>
     }
 </div>

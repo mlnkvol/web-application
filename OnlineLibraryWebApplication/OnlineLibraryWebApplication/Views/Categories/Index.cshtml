@@ -6,10 +6,10 @@
 
 <h1>Категорії книг</h1>
 
-<p>
+@*<p>
     @Html.ActionLink("Додати нову категорію", "Create", new { categoryId = ViewBag.CategoryId })
 </p>
-@* <table class="table">
+ <table class="table">
     <thead>
         <tr>
             <th>
@@ -34,11 +34,17 @@
     </tbody>
 </table>
  *@
-<div class="list-group">
+<div class="row row-cols-1 row-cols-md-3 g-4">
     @foreach (var category in Model)
     {
-        <a href="@Url.Action("Index", "Genres", new { Id = category.Id, Name = category.CategoryName, filteredBy = "categories" })" class="list-group-item list-group-item-action custom-card d-flex justify-content-between align-items-center">
-            <h5 class="card-title">@Html.DisplayFor(modelItem => category.CategoryName)</h5>
-        </a>
+        <div class="col">
+            <a href="@Url.Action("Index", "Genres", new { Id = category.Id, Name = category.CategoryName, filteredBy = "categories" })" class="card custom-card-category">
+                <!-- Змінено клас на custom-card-category -->
+                <img src="@Url.Content($"~/pictures/{category.CategoryName}.jpg")" class="card-img-top" alt="Картинка категорії">
+                <div class="card-body">
+                    <h5 class="card-title">@Html.DisplayFor(modelItem => category.CategoryName)</h5>
+                </div>
+            </a>
+        </div>
     }
 </div>

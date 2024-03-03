@@ -6,10 +6,10 @@
 
 <h1>@ViewBag.PageTitle</h1>
 
-<p>
+@*<p>
     @Html.ActionLink("Додати нову книгу", "Create", new {categoryId = ViewBag.CategoryId})
 </p>
-@* <table class="table">
+ <table class="table">
     <thead>
         <tr>
             <th>
@@ -59,6 +59,14 @@
 }
     </tbody>
 </table> *@
+<form action="@Url.Action("Index")" method="get">
+    <div class="input-group mb-3" style="width: 33%;">
+        <input type="text" class="form-control rounded-pill" placeholder="Введіть назву книги" name="search" />
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary rounded-pill" type="submit">Пошук</button>
+        </div>
+    </div>
+</form>
 
 @foreach (var book in Model)
 {

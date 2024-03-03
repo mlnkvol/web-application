@@ -113,7 +113,13 @@
                     </p>
                     <p id="read-more" class="card-text additional-info read-more" onclick="toggleDescription()">Читати далі</p>
                     <div class="buttons-container">
-                        <button class="custom-button mt-3" onclick="addToLibrary()">Додати до бібліотеки</button>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <form id="addToLibraryForm">
+                                <input type="hidden" id="bookId" value="@Model.Id" />
+                                <button type="button" class="custom-button mt-3" onclick="addToLibrary()">Додати до бібліотеки</button>
+                            </form>
+                        }
                     </div>
                 </div>               
             </dl>

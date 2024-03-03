@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineLibraryWebApplication.Models;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace OnlineLibraryWebApplication.Controllers
 {
@@ -19,8 +20,13 @@ namespace OnlineLibraryWebApplication.Controllers
         }
 
         // GET: Books
-        public async Task<IActionResult> Index(int? id, string? name, string? filteredBy)
+        public async Task<IActionResult> Index(int? id, string? name, string? filteredBy, string? search)
         {
+            IQueryable<Book> books = _context.Books
+                .Include(b => b.Publisher)
+                .Include(b => b.Categories)
+                .Include(b => b.Genres)
+                .Include(b => b.Authors);
             switch (filteredBy)
             {
                 case ("categories"):
@@ -78,13 +84,15 @@ namespace OnlineLibraryWebApplication.Controllers
                     return View(await booksByAuthors.ToListAsync());
                 default:
                     ViewBag.PageTitle = "Всі книги";
-                    return View(await _context.Books
-                        .Include(b => b.Publisher)
-                        .Include(b => b.Categories)
-                        .Include(b => b.Genres)
-                        .Include(b => b.Authors)
-                        .ToListAsync());
+                    break;
             }
+            if (!string.IsNullOrEmpty(search))
+            {
+                books = books.Where(b => b.Title.Contains(search));
+                ViewBag.PageTitle = "Результати пошуку за: " + search;
+            }
+
+            return View(await books.ToListAsync());
         }
 
 
