@@ -47,5 +47,47 @@
                 }
             </div>
         </div>
+        <div class="col-md-6">
+            <div id="genreChart" style="margin-top: 50px;"></div>
+        </div>
     </div>
 </div>
+
+@section scripts {
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var categoryId = @ViewData["CategoryId"] || 0;
+
+            $.get(`/api/Chart/Genres?categoryId=${categoryId}`, function (JsonData) {
+                var data = google.visualization.arrayToDataTable(JsonData);
+                var options = {
+                    title: "Співвідношення кількості книжок та жанрів",
+                    width: 600,
+                    height: 400,
+                    colors: [
+                        '#9E7BFF',
+                        '#7E57C2',
+                        '#AB83FF',
+                        '#5E35B1',
+                        '#D1C4E9',
+                        '#673AB7',
+                        '#C5CAE9',
+                        '#311B92',
+                        '#B39DDB',
+                        '#512DA8'
+                    ],
+                    hAxis: {
+                        ticks: [0, 2, 4, 6, 8, 10]
+                    }
+                };
+
+                var chart = new google.visualization.BarChart(document.getElementById('genreChart'));
+                chart.draw(data, options);
+            });
+        }
+    </script>
+}

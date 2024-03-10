@@ -48,3 +48,38 @@
         </div>
     }
 </div>
+
+@section scripts {
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            $.get('/api/Chart/JsonData', function (JsonData) {
+                var data = google.visualization.arrayToDataTable(JsonData);
+                var options = {
+                    title: "Співвідношення кількості книжок та категорій",
+                    width: 600,
+                    height: 400,
+                    colors: [
+                        '#9E7BFF',
+                        '#7E57C2',
+                        '#D1C4E9',
+                        '#C5CAE9',
+                        '#311B92',
+                        '#B39DDB',
+                        '#512DA8'
+                    ]
+                };
+
+                var chart = new google.visualization.PieChart(document.getElementById('chart1'));
+                chart.draw(data, options);
+            });
+        }
+    </script>
+}
+
+<div style="display: flex; justify-content: center; align-items: center;">
+    <div id="chart1"></div>
+</div>

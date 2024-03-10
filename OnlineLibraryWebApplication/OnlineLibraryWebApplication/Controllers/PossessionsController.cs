@@ -29,14 +29,14 @@ namespace OnlineLibraryWebApplication.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToLibrary(int id)
         {
-            // Перевірка, чи книга вже є у бібліотеці користувача
+            // Перевіряю, чи книга вже є у бібліотеці користувача
             var existingPossession = await _context.Possessions
                 .Where(p => p.BookId == id)
                 .FirstOrDefaultAsync();
 
             if (existingPossession == null)
             {
-                // Якщо книги немає у бібліотеці, додати її
+                // Якщо книги немає у бібліотеці, додаю її
                 _context.Possessions.Add(new Possession { BookId = id });
                 await _context.SaveChangesAsync();
             }
