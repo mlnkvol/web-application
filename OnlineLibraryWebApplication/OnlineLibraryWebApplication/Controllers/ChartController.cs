@@ -1,56 +1,55 @@
 ﻿using Humanizer.Localisation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OnlineLibraryWebApplication.Models;
 
 namespace OnlineLibraryWebApplication.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ChartController : ControllerBase
+    public class ChartsController : ControllerBase
     {
-        private readonly DblibraryContext _context;
-        public ChartController(DblibraryContext context)
+        private record CountByCategoryResponseItem(string Category, int Count);
+        private record CountByGenreResponseItem(string Genre, int Count);
+        private readonly DblibraryContext libraryContext;
+        public ChartsController(DblibraryContext libraryContext)
         {
-            _context = context;
+            this.libraryContext = libraryContext;
         }
 
-        [HttpGet("JsonData")]
-        public JsonResult JsonData()
+        [HttpGet("countByCategories")]
+        public async Task<JsonResult> GetCountByCategoriesAsync(CancellationToken cancellationToken)
         {
-            var categories = _context.Categories.ToList();
-            List<object> catBook = new List<object>();
-            catBook.Add(new object[] { "Категорія", "Кількість книжок" });
+            var responseItems = await libraryContext.Categories
+                .Select(category => new CountByCategoryResponseItem(category.CategoryName, category.Books.Count()))
+                .ToListAsync(cancellationToken);
 
-            foreach (var c  in categories)
-            {
-                var bookCount = _context.Books.Count(b => b.Categories.Any(bookCategory => bookCategory.Id == c.Id));
-                catBook.Add(new object[] { c.CategoryName, bookCount });
-            }
-
-            return new JsonResult(catBook);
-
+            return new JsonResult(responseItems);
         }
 
-        [HttpGet("Genres")]
-        public JsonResult Genres(int categoryId)
+        [HttpGet("countByGenres")]
+        public async Task<JsonResult> GetCountByGenresAsync(CancellationToken cancellationToken)
         {
-            var genres = _context.Genres
-                .Where(g => g.Books.Any(b => b.Categories.Any(c => c.Id == categoryId)))
-                .ToList();
+            var responseItems = await libraryContext.Genres
+                .OrderByDescending(genre => genre.Books.Count())
+                .Take(5)
+                .Select(genre => new CountByGenreResponseItem(genre.GenreName, genre.Books.Count()))
+                .ToListAsync(cancellationToken);
 
-            List<object> genBook = new List<object>();
-            genBook.Add(new object[] { "Жанр", "Кількість книжок" });
-
-            foreach (var g in genres)
-            {
-                var bookCount = _context.Books.Count(b => b.Genres.Any(bookGenre => bookGenre.Id == g.Id));
-                genBook.Add(new object[] { g.GenreName, bookCount });
-            }
-
-            return new JsonResult(genBook);
+            return new JsonResult(responseItems);
         }
 
+        [HttpGet("countByGenres2")]
+        public async Task<JsonResult> GetCountByGenres2Async(CancellationToken cancellationToken)
+        {
+            var responseItems = await libraryContext.Genres
+                .OrderBy(genre => genre.Books.Count())
+                .Take(5)
+                .Select(genre => new CountByGenreResponseItem(genre.GenreName, genre.Books.Count()))
+                .ToListAsync(cancellationToken);
 
+            return new JsonResult(responseItems);
+        }
     }
 }

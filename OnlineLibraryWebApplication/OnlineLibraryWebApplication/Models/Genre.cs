@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OnlineLibraryWebApplication.Models;
 
-public partial class Genre
+public partial class Genre : Entity
 {
     public int Id { get; set; }
 

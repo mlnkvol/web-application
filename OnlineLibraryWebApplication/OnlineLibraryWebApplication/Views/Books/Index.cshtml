@@ -68,6 +68,9 @@
     </div>
 </form>
 
+<a class="btn btn-primary mb-3" type="submit" asp-area="" asp-controller="Books" asp-action="Import">Завантажити з файлу</a>
+<a class="btn btn-primary mb-3" type="submit" asp-area="" asp-controller="Books" asp-action="Export">Експортувати у файл</a>
+
 @foreach (var book in Model)
 {
     <div class="card mb-3 custom-card" style="max-width: 900px;">

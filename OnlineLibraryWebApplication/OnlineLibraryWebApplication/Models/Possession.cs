@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace OnlineLibraryWebApplication.Models;
 
-public partial class Possession
+public partial class Possession: Entity
 {
     public int Id { get; set; }
 

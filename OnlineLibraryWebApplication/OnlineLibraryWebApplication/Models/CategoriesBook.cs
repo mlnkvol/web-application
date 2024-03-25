@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace OnlineLibraryWebApplication.Models;
 
-public partial class CategoriesBook
+public partial class CategoriesBook : Entity
 {
     public int CategoryId { get; set; }
 

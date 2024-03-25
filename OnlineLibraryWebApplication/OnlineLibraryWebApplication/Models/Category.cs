@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OnlineLibraryWebApplication.Models;
 
-public partial class Category
+public partial class Category: Entity
 {
     public int Id { get; set; }
 

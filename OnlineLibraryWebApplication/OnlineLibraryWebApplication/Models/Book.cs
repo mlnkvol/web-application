@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OnlineLibraryWebApplication.Models;
 
-public partial class Book
+public partial class Book: Entity
 {
     public int Id { get; set; }
 
@@ -32,7 +32,7 @@ public partial class Book
 
     public virtual Publisher Publisher { get; set; } = null!;
 
-    [NotMapped] // Це атрибут, щоб Entity Framework ігнорував цю властивість при створенні бази даних
+    [NotMapped] 
     public string PublisherName => Publisher?.PublisherName;
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();

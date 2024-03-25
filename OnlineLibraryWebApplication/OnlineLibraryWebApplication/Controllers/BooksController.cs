@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineLibraryWebApplication.Models;
+using OnlineLibraryWebApplication.Services;
 using static System.Reflection.Metadata.BlobBuilder;
 
 namespace OnlineLibraryWebApplication.Controllers
@@ -13,10 +14,12 @@ namespace OnlineLibraryWebApplication.Controllers
     public class BooksController : Controller
     {
         private readonly DblibraryContext _context;
+        private readonly IDataPortServiceFactory<Book> _bookDataPortServiceFactory;
 
-        public BooksController(DblibraryContext context)
+        public BooksController(DblibraryContext context, IDataPortServiceFactory<Book> bookDataPortServiceFactory)
         {
             _context = context;
+            _bookDataPortServiceFactory = bookDataPortServiceFactory;
         }
 
         // GET: Books
@@ -142,6 +145,51 @@ namespace OnlineLibraryWebApplication.Controllers
             }
             ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "Id", book.PublisherId);
             return View(book);
+        }
+
+
+        [HttpGet]
+        public IActionResult Import()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Import(IFormFile booksFile, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (booksFile == null || booksFile.Length == 0)
+                {
+                    ModelState.AddModelError("booksFile", "Please select a file to upload.");
+                    return View();
+                }
+
+                var importService = this._bookDataPortServiceFactory.GetImportService(booksFile.ContentType);
+                using var stream = booksFile.OpenReadStream();
+                await importService.ImportFromStreamAsync(stream, cancellationToken);
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "An error occurred while importing the file. Please try again.");
+                return View();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Export([FromQuery] string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", CancellationToken cancellationToken = default)
+        {
+            var exportService = _bookDataPortServiceFactory.GetExportService(contentType);
+            var memoryStream = new MemoryStream();
+            await exportService.WriteToAsync(memoryStream, cancellationToken);
+            await memoryStream.FlushAsync(cancellationToken);
+            memoryStream.Position = 0;
+            return new FileStreamResult(memoryStream, contentType)
+            {
+                FileDownloadName = $"books_{DateTime.UtcNow.ToShortDateString()}.xlsx"
+            };
         }
 
         // GET: Books/Edit/5

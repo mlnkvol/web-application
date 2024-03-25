@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OnlineLibraryWebApplication.Models;
 
-public partial class Publisher
+public partial class Publisher : Entity
 {
     public int Id { get; set; }
 

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineLibraryWebApplication.Models;
 
-public partial class Review
+public partial class Review: Entity
 {
     public int Id { get; set; }
 

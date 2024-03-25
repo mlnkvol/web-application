@@ -116,26 +116,26 @@ body {
 }
 
 #reviewsCarousel {
-    background-color: white; /* Білий задній фон */
-    border-radius: 15px; /* Закруглені краї контейнера */
-    padding: 20px; /* Відступи від країв блоку */
+    background-color: white; 
+    border-radius: 15px; 
+    padding: 20px; 
 }
 
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-    background-color: #B19CD9; /* Колір стрілок Next і Previous */
-    border-radius: 50%; /* Закруглення стрілок */
+    background-color: #B19CD9; 
+    border-radius: 50%; 
 }
 
 .carousel-item {
-    background-color: white; /* Білий задній фон окремого відгуку */
-    color: #6E6893; /* Колір тексту відгуку */
-    border-radius: 15px; /* Закруглені краї окремого відгуку */
-    padding: 20px; /* Відступи від країв окремого відгуку */
+    background-color: white; 
+    color: #6E6893; 
+    border-radius: 15px; 
+    padding: 20px; 
 }
 
 .review-item strong {
-    color: #B19CD9; /* Колір імені користувача (жирний текст) */
+    color: #B19CD9; 
 }
 
 .carousel-control-prev,

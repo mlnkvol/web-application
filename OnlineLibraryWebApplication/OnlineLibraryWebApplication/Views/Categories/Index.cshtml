@@ -49,16 +49,25 @@
     }
 </div>
 
-@section scripts {
+@section Scripts {
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script>
+    <script type="text/javascript">
         google.charts.load('current', { 'packages': ['corechart'] });
-        google.charts.setOnLoadCallback(drawChart);
+        google.charts.setOnLoadCallback(drawCharts);
 
-        function drawChart() {
-            $.get('/api/Chart/JsonData', function (JsonData) {
-                var data = google.visualization.arrayToDataTable(JsonData);
-                var options = {
+        function drawCharts() {
+            fetch('/api/charts/countByCategories')
+            .then(response => response.json())
+            .then(data => { 
+                const dataTable = new 
+                    google.visualization.DataTable();
+                    dataTable.addColumn('string', 'Категорія');
+                    dataTable.addColumn('number', 'Кількість книг');
+                    data.forEach(item => {
+                        dataTable.addRow([item.category, item.count]);
+                });
+                
+                const options = {
                     title: "Співвідношення кількості книжок та категорій",
                     width: 600,
                     height: 400,
@@ -73,13 +82,13 @@
                     ]
                 };
 
-                var chart = new google.visualization.PieChart(document.getElementById('chart1'));
-                chart.draw(data, options);
+                const chart = new google.visualization.PieChart(document.getElementById('countByCategoryChart'));
+                chart.draw(dataTable, options);
             });
         }
     </script>
 }
 
 <div style="display: flex; justify-content: center; align-items: center;">
-    <div id="chart1"></div>
+    <div id="countByCategoryChart"></div>
 </div>

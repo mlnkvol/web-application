@@ -1,6 +1,7 @@
 using OnlineLibraryWebApplication;
 using Microsoft.EntityFrameworkCore;
 using OnlineLibraryWebApplication.Models;
+using OnlineLibraryWebApplication.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,9 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<DblibraryContext>(option => option.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")
-    ));
+));
+
+builder.Services.AddScoped<IDataPortServiceFactory<Book>, BookDataPortServiceFactory>();
 
 var app = builder.Build();
 
@@ -61,3 +64,4 @@ app.UseEndpoints(endpoints =>
 });
 
 app.Run();
+
