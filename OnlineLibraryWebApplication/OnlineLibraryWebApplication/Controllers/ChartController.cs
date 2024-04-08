@@ -1,4 +1,5 @@
-﻿using Humanizer.Localisation;
+﻿using DocumentFormat.OpenXml.InkML;
+using Humanizer.Localisation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,28 +29,17 @@ namespace OnlineLibraryWebApplication.Controllers
             return new JsonResult(responseItems);
         }
 
-        [HttpGet("countByGenres")]
-        public async Task<JsonResult> GetCountByGenresAsync(CancellationToken cancellationToken)
+        [HttpGet("bookTimeline")]
+        public async Task<ActionResult<IEnumerable<object>>> GetBookTimelineAsync(CancellationToken cancellationToken)
         {
-            var responseItems = await libraryContext.Genres
-                .OrderByDescending(genre => genre.Books.Count())
-                .Take(5)
-                .Select(genre => new CountByGenreResponseItem(genre.GenreName, genre.Books.Count()))
-                .ToListAsync(cancellationToken);
-
-            return new JsonResult(responseItems);
-        }
-
-        [HttpGet("countByGenres2")]
-        public async Task<JsonResult> GetCountByGenres2Async(CancellationToken cancellationToken)
-        {
-            var responseItems = await libraryContext.Genres
-                .OrderBy(genre => genre.Books.Count())
-                .Take(5)
-                .Select(genre => new CountByGenreResponseItem(genre.GenreName, genre.Books.Count()))
-                .ToListAsync(cancellationToken);
-
-            return new JsonResult(responseItems);
+            var books = await libraryContext.Books.ToListAsync(cancellationToken);
+            var timelineData = books.GroupBy(b => b.PublicationYear)
+                                    .Select(g => new
+                                    {
+                                        Year = g.Key,
+                                        Books = g.Select(b => new { Title = b.Title, CoverImagePath = $"data:image/jpg;base64,{Convert.ToBase64String(b.Image)}" })
+                                    });
+            return timelineData.ToList();
         }
     }
 }

@@ -59,3 +59,23 @@ function addToLibrary() {
     });
 }
 
+document.getElementById('exportButton').addEventListener('click', async () => {
+    const format = document.getElementById('exportFormat').value;
+    try {
+        const response = await fetch(`/Books/Export?format=${format}`, {
+            method: 'GET'
+        });
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `books.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Помилка експорту:', error);
+    }
+});
+
+

@@ -21,10 +21,11 @@ namespace OnlineLibraryWebApplication.Services
         private async Task AddBookAsync(IXLRow row, CancellationToken cancellationToken)
         {
             var bookTitle = row.Cell(1).GetValue<string>();
-            var book = await context.Books.FirstOrDefaultAsync(book => book.Title == bookTitle, cancellationToken);
+            var publicationYear = row.Cell(3).GetValue<int>(); // Отримання року видання
+            var book = await context.Books.FirstOrDefaultAsync(book => book.Title == bookTitle && book.PublicationYear == publicationYear, cancellationToken);
             if (book is null)
             {
-                book = new Book { Title = bookTitle, PublicationYear = GetPublicationYear(row) };
+                book = new Book { Title = bookTitle, PublicationYear = publicationYear };
                 context.Add(book);
             }
 
@@ -43,11 +44,6 @@ namespace OnlineLibraryWebApplication.Services
             await context.SaveChangesAsync(cancellationToken);
         }
 
-        private static int GetPublicationYear(IXLRow row)
-        {
-            return int.Parse(row.Cell(3).GetValue<string>());
-        }
-
         public async Task ImportFromStreamAsync(Stream stream, CancellationToken cancellationToken)
         {
             if (!stream.CanRead)
@@ -62,9 +58,9 @@ namespace OnlineLibraryWebApplication.Services
                 return;
             }
 
-            foreach (var rows in worksheet.RowsUsed().Skip(1))
+            foreach (var row in worksheet.RowsUsed().Skip(1)) // Пропускаємо заголовок
             {
-                await AddBookAsync(rows, cancellationToken);
+                await AddBookAsync(row, cancellationToken);
             }
         }
     }
