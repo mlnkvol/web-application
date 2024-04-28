@@ -20,24 +20,50 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav mx-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-white @(ViewContext.RouteData.Values["Controller"].ToString() == "Categories" ? "active" : "")" asp-area="" asp-controller="Categories" asp-action="Index">Категорії</a>
+                            <a class="nav-link text-white @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Categories" ? "active" : "")" asp-area="" asp-controller="Categories" asp-action="Index">Категорії</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white @(ViewContext.RouteData.Values["Controller"].ToString() == "Books" ? "active" : "")" asp-area="" asp-controller="Books" asp-action="Index">Всі Книги</a>
+                            <a class="nav-link text-white @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Books" ? "active" : "")" asp-area="" asp-controller="Books" asp-action="Index">Всі Книги</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white @(ViewContext.RouteData.Values["Controller"].ToString() == "Publishers" ? "active" : "")" asp-area="" asp-controller="Publishers" asp-action="Index">Видавництва</a>
+                            <a class="nav-link text-white @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Publishers" ? "active" : "")" asp-area="" asp-controller="Publishers" asp-action="Index">Видавництва</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white @(ViewContext.RouteData.Values["Controller"].ToString() == "Genres" ? "active" : "")" asp-area="" asp-controller="Genres" asp-action="Index">Жанри</a>
+                            <a class="nav-link text-white @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Genres" ? "active" : "")" asp-area="" asp-controller="Genres" asp-action="Index">Жанри</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white @(ViewContext.RouteData.Values["Controller"].ToString() == "Authors" ? "active" : "")" asp-area="" asp-controller="Authors" asp-action="Index">Автори</a>
+                            <a class="nav-link text-white @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Authors" ? "active" : "")" asp-area="" asp-controller="Authors" asp-action="Index">Автори</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white @(ViewContext.RouteData.Values["Controller"].ToString() == "Possessions" ? "active" : "")" asp-area="" asp-controller="Possessions" asp-action="Index">Моя бібліотека</a>
+                            <a class="nav-link text-white @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Possessions" ? "active" : "")" asp-area="" asp-controller="Possessions" asp-action="Index">Моя бібліотека</a>
                         </li>
                     </ul>
+                    <ul class="navbar-nav">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#">@User.Identity.Name</a> <!-- Відображення email авторизованого користувача -->
+                            </li>
+                            <li class="nav-item">
+                                <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Categories", new { area = "" })">
+                                    <button id="logout" type="submit" class="nav-link btn btn-link text-dark border-0">Вийти</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="/Identity/Account/Register">Зареєструватися</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="/Identity/Account/Login">Увійти</a>
+                            </li>
+                        }
+                    </ul>
+
+
+
+
                 </div>
             </div>
         </nav>

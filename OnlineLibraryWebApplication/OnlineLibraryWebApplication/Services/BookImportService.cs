@@ -11,37 +11,38 @@ namespace OnlineLibraryWebApplication.Services
 {
     public class BookImportService : IImportService<Book>
     {
-        private readonly DblibraryContext context;
+        private readonly DblibraryContext _context;
 
         public BookImportService(DblibraryContext context)
         {
-            this.context = context;
+            _context = context;
         }
 
         private async Task AddBookAsync(IXLRow row, CancellationToken cancellationToken)
         {
             var bookTitle = row.Cell(1).GetValue<string>();
-            var publicationYear = row.Cell(3).GetValue<int>(); // Отримання року видання
-            var book = await context.Books.FirstOrDefaultAsync(book => book.Title == bookTitle && book.PublicationYear == publicationYear, cancellationToken);
-            if (book is null)
-            {
-                book = new Book { Title = bookTitle, PublicationYear = publicationYear };
-                context.Add(book);
-            }
+            var publicationYear = row.Cell(3).GetValue<int>();
 
             var publisherName = row.Cell(2).GetValue<string>();
+            Publisher publisher = null;
             if (!string.IsNullOrEmpty(publisherName))
             {
-                var publisher = await context.Publishers.FirstOrDefaultAsync(publisher => publisher.PublisherName == publisherName, cancellationToken);
-                if (publisher is null)
+                publisher = await _context.Publishers.FirstOrDefaultAsync(p => p.PublisherName == publisherName, cancellationToken);
+                if (publisher == null)
                 {
                     publisher = new Publisher { PublisherName = publisherName };
-                    context.Add(publisher);
+                    _context.Publishers.Add(publisher);
+                    await _context.SaveChangesAsync(cancellationToken);
                 }
-                book.Publisher = publisher;
             }
 
-            await context.SaveChangesAsync(cancellationToken);
+            var book = await _context.Books.FirstOrDefaultAsync(b => b.Title == bookTitle && b.PublicationYear == publicationYear, cancellationToken);
+            if (book == null)
+            {
+                book = new Book { Title = bookTitle, PublicationYear = publicationYear, Publisher = publisher };
+                _context.Books.Add(book);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
         }
 
         public async Task ImportFromStreamAsync(Stream stream, CancellationToken cancellationToken)
@@ -53,14 +54,12 @@ namespace OnlineLibraryWebApplication.Services
 
             using var workbook = new XLWorkbook(stream);
             var worksheet = workbook.Worksheets.FirstOrDefault();
-            if (worksheet is null)
+            if (worksheet != null)
             {
-                return;
-            }
-
-            foreach (var row in worksheet.RowsUsed().Skip(1)) // Пропускаємо заголовок
-            {
-                await AddBookAsync(row, cancellationToken);
+                foreach (var row in worksheet.RowsUsed().Skip(1))
+                {
+                    await AddBookAsync(row, cancellationToken);
+                }
             }
         }
     }

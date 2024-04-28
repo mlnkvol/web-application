@@ -30,65 +30,46 @@ namespace OnlineLibraryWebApplication.Controllers
                 .Include(b => b.Categories)
                 .Include(b => b.Genres)
                 .Include(b => b.Authors);
+
             switch (filteredBy)
             {
-                case ("categories"):
-                    //знаходження книжок за категорією
+                case "categories":
+                    // Фільтруємо книги за категорією
                     ViewBag.CategoryId = id;
                     ViewBag.CategoryName = name;
-                    ViewBag.PageTitle = "Книги за категорією" + " " + @ViewBag.CategoryName;
-                    var booksByCategory = _context.Books
-                        .Include(b => b.Publisher)
-                        .Include(b => b.Categories)
-                        .Include(b => b.Genres)
-                        .Include(b => b.Authors)
-                        .Where(b => b.Categories
-                        .Any(c => c.Id == id));
+                    ViewBag.PageTitle = "Книги за категорією " + ViewBag.CategoryName;
+                    books = books.Where(b => b.Categories.Any(c => c.Id == id));
+                    break;
 
-                    return View(await booksByCategory.ToListAsync());
-                case ("publishers"):
-                    //знаходження книжок за видавництвом
+                case "publishers":
+                    // Фільтруємо книги за видавництвом
                     ViewBag.PublisherId = id;
                     ViewBag.PublisherName = name;
-                    ViewBag.PageTitle = "Книги видавництва" + " " + @ViewBag.PublisherName;
-                    var booksByPublisher = _context.Books
-                        .Include(b => b.Publisher)
-                        .Include(b => b.Categories)
-                        .Include(b => b.Genres)
-                        .Include(b => b.Authors)
-                        .Where(b => b.PublisherId == id);
+                    ViewBag.PageTitle = "Книги видавництва " + ViewBag.PublisherName;
+                    books = books.Where(b => b.PublisherId == id);
+                    break;
 
-                    return View(await booksByPublisher.ToListAsync());
-                case ("genres"):
-                    //знаходження книжок за жанром
+                case "genres":
+                    // Фільтруємо книги за жанром
                     ViewBag.GenreId = id;
                     ViewBag.GenreName = name;
-                    ViewBag.PageTitle = "Книги за жанром" + " " + @ViewBag.GenreName;
-                    var booksByGenres = _context.Books
-                        .Where(b => b.Genres.Any(g => g.Id == id))
-                        .Include(b => b.Publisher)
-                        .Include(b => b.Categories)
-                        .Include(b => b.Genres)
-                        .Include(b => b.Authors);
+                    ViewBag.PageTitle = "Книги за жанром " + ViewBag.GenreName;
+                    books = books.Where(b => b.Genres.Any(g => g.Id == id));
+                    break;
 
-                    return View(await booksByGenres.ToListAsync());
-                case ("authors"):
-                    //знаходження книжок за автором
+                case "authors":
+                    // Фільтруємо книги за автором
                     ViewBag.AuthorId = id;
                     ViewBag.Author1 = name;
-                    ViewBag.PageTitle = "Книги автора" + " " + @ViewBag.Author1;
-                    var booksByAuthors = _context.Books
-                        .Include(b => b.Publisher)
-                        .Include(b => b.Categories)
-                        .Include(b => b.Genres)
-                        .Include(b => b.Authors)
-                        .Where(b => b.Authors.Any(a => a.Id == id));
+                    ViewBag.PageTitle = "Книги автора " + ViewBag.Author1;
+                    books = books.Where(b => b.Authors.Any(a => a.Id == id));
+                    break;
 
-                    return View(await booksByAuthors.ToListAsync());
                 default:
                     ViewBag.PageTitle = "Всі книги";
                     break;
             }
+
             if (!string.IsNullOrEmpty(search))
             {
                 books = books.Where(b => b.Title.Contains(search));
@@ -97,6 +78,7 @@ namespace OnlineLibraryWebApplication.Controllers
 
             return View(await books.ToListAsync());
         }
+
 
 
         // GET: Books/Details/5

@@ -37,9 +37,21 @@ namespace OnlineLibraryWebApplication.Controllers
                                     .Select(g => new
                                     {
                                         Year = g.Key,
-                                        Books = g.Select(b => new { Title = b.Title, CoverImagePath = $"data:image/jpg;base64,{Convert.ToBase64String(b.Image)}" })
-                                    });
+                                        Books = g.Select(b => new { Title = b.Title, CoverImage = ConvertToBase64(b.Image) })
+                                    })
+                                    .OrderByDescending(e => e.Year);
+
             return timelineData.ToList();
         }
+
+        private string ConvertToBase64(byte[] imageBytes)
+        {
+            if (imageBytes == null || imageBytes.Length == 0)
+            {
+                return null;
+            }
+            return $"data:image/jpeg;base64,{Convert.ToBase64String(imageBytes)}";
+        }
+
     }
 }

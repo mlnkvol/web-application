@@ -88,10 +88,10 @@
             <div class="col-md-8">
                 <div class="card-body">
                     <h5 class="card-title">@Html.DisplayFor(modelItem => book.Title)</h5>
-                    <p class="card-text card-description">@Html.Raw(book.Description.ToString().Substring(0, Math.Min(250, book.Description.Length))) ...</p>
+                    <p class="card-text card-description">@Html.Raw(book.Description.Substring(0, Math.Min(250, book.Description.Length))) ...</p>
                     <p class="card-text additional-info">
                         Видавництво:
-                        <a href="@Url.Action("Index", "Books", new { id = book.PublisherId, name = book.PublisherName, filteredBy = "publishers" })">
+                        <a href="@Url.Action("Index", "Books", new { id = book.PublisherId, name = book.Publisher.PublisherName, filteredBy = "publishers" })">
                             <strong>@Html.DisplayFor(modelItem => book.Publisher.PublisherName)</strong>
                         </a>
                     </p>
@@ -103,7 +103,7 @@
                             <a href="@Url.Action("Index", "Books", new { id = category.Id, name = category.CategoryName, filteredBy = "categories" })">
                                 <strong>@category.CategoryName</strong>
                             </a>
-                            @if (category != book.Categories.Last())
+                            @if (!category.Equals(book.Categories.Last()))
                             {
                                 <span class="comma">, </span>
                             }
@@ -116,7 +116,7 @@
                             <a href="@Url.Action("Index", "Books", new { id = genre.Id, name = genre.GenreName, filteredBy = "genres" })">
                                 <strong>@genre.GenreName</strong>
                             </a>
-                            @if (genre != book.Genres.Last())
+                            @if (!genre.Equals(book.Genres.Last()))
                             {
                                 <span class="comma">, </span>
                             }
@@ -129,7 +129,7 @@
                             <a href="@Url.Action("Index", "Books", new { id = author.Id, name = author.Author1, filteredBy = "authors" })">
                                 <strong>@author.Author1</strong>
                             </a>
-                            @if (author != book.Authors.Last())
+                            @if (!author.Equals(book.Authors.Last()))
                             {
                                 <span class="comma">, </span>
                             }

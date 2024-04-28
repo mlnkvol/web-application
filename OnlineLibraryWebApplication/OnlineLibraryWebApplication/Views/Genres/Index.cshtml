@@ -61,23 +61,30 @@
 
         function drawCharts() {
             function drawBookTimeline() {
-                fetch(`/api/charts/bookTimeline`)
+                fetch('/api/charts/bookTimeline')
                     .then(response => response.json())
                     .then(data => {
                         const container = document.getElementById('bookTimelineChart');
                         const chart = new google.visualization.Timeline(container);
                         const dataTable = new google.visualization.DataTable();
+
                         dataTable.addColumn({ type: 'string', id: 'Year' });
                         dataTable.addColumn({ type: 'string', id: 'Book' });
                         dataTable.addColumn({ type: 'date', id: 'Start' });
                         dataTable.addColumn({ type: 'date', id: 'End' });
+                        dataTable.addColumn({ type: 'string', role: 'tooltip', 'p': { 'html': true } });
 
                         data.forEach(item => {
                             if (item && item.books) {
                                 item.books.forEach(book => {
                                     const startDate = new Date(item.year, 0, 1);
                                     const endDate = new Date(item.year, 11, 31);
-                                    dataTable.addRow([item.year.toString(), book.title, startDate, endDate]);
+                                    const tooltipHtml = `
+                                                <div>
+                                                    <strong>${book.title}</strong><br/>
+                                                    <img src="${book.coverImage}" alt="${book.title}" style="width: 100px; height: auto;" />
+                                                </div>`;
+                                    dataTable.addRow([item.year.toString(), book.title, startDate, endDate, tooltipHtml]);
                                 });
                             }
                         });
@@ -86,7 +93,8 @@
                             title: 'Book Timeline',
                             width: 800,
                             height: 600,
-                            colors: ['#9E7BFF']
+                            colors: ['#9E7BFF'],
+                            tooltip: { isHtml: true }
                         };
 
                         chart.draw(dataTable, options);

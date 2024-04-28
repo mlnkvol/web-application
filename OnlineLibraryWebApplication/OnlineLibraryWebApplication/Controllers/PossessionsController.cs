@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ namespace OnlineLibraryWebApplication.Controllers
         }
 
         // GET: Possessions
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var dblibraryContext = _context.Possessions.Include(p => p.Book).Include(p => p.User);
@@ -26,24 +28,35 @@ namespace OnlineLibraryWebApplication.Controllers
         }
 
         // POST: Possessions/AddToLibrary/5
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddToLibrary(int id)
         {
-            // Перевіряю, чи книга вже є у бібліотеці користувача
-            var existingPossession = await _context.Possessions
-                .Where(p => p.BookId == id)
-                .FirstOrDefaultAsync();
+            // Отримати ID поточного користувача
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            if (existingPossession == null)
+            // Перевірити, чи книга вже є в бібліотеці користувача
+            var possession = await _context.Possessions.FindAsync(userId, id);
+            if (possession != null)
             {
-                // Якщо книги немає у бібліотеці, додаю її
-                _context.Possessions.Add(new Possession { BookId = id });
-                await _context.SaveChangesAsync();
+                // Якщо книга вже є в бібліотеці, повернути відповідь з помилкою
+                return BadRequest("Ця книга вже є у вашій бібліотеці.");
             }
 
-            // Повернення до сторінки з книгою
-            return RedirectToAction("Details", "Books", new { id });
+            // Додати нову позицію до бібліотеки користувача
+            _context.Possessions.Add(new Possession
+            {
+                UserId = int.Parse(userId),
+                BookId = id,
+                StartTime = DateTime.Now
+            });
+
+            await _context.SaveChangesAsync();
+
+            // Повернути успішну відповідь
+            return Ok("Книга успішно додана до вашої бібліотеки.");
         }
+
 
         // GET: Possessions/Details/5
         public async Task<IActionResult> Details(int? id)

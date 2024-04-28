@@ -45,24 +45,38 @@ $(document).ready(function () {
 });
 
 function addToLibrary() {
-    var bookId = $("#bookId").val();
+    var bookId = document.getElementById('bookId').value;
 
-    $.ajax({
-        url: "/Possessions/AddToLibrary/" + bookId,
-        type: "POST",
-        success: function () {
-            alert("Книга додана до бібліотеки!");
+    fetch('/Books/AddToLibrary', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]').value // Якщо ви використовуєте захист від CSRF-атак
         },
-        error: function () {
-            alert("Помилка під час додавання до бібліотеки.");
-        }
-    });
+        body: JSON.stringify({
+            bookId: bookId
+        })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Виникла помилка: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data); // Повідомлення про успішне додавання книги до бібліотеки
+        })
+        .catch(error => {
+            console.error('Помилка:', error);
+            alert('Сталася помилка при спробі додати книгу до бібліотеки.');
+        });
 }
+
 
 document.getElementById('exportButton').addEventListener('click', async () => {
     const format = document.getElementById('exportFormat').value;
     try {
-        const response = await fetch(`/Books/Export?format=${format}`, {
+        const response = await fetch(`/Books/Export?format=${format}`, { 
             method: 'GET'
         });
         const blob = await response.blob();
