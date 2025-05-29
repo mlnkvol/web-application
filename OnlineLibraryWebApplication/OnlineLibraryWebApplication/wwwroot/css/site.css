@@ -219,3 +219,288 @@ h1 {
     .custom-card-category:hover {
         background-color: #E5D8FF;
     }
+
+/* Бічний блок */
+.sidebar {
+    position: fixed;
+    right: 20px;
+    top: 150px;
+    width: 250px;
+    background-color: #f0e6ff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+    .sidebar h4 {
+        margin-bottom: 10px;
+        color: #4b0082;
+    }
+
+    .sidebar button {
+        background-color: #4b0082;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+        .sidebar button:hover {
+            background-color: #6a0dad;
+        }
+
+/* Модальне вікно */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    width: 50%;
+    border-radius: 10px;
+    text-align: center;
+}
+
+    .modal-content h3 {
+        margin-bottom: 20px;
+    }
+
+    .modal-content button {
+        margin: 5px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+.option-btn {
+    background-color: #e6e6fa;
+    color: #333;
+}
+
+    .option-btn:hover {
+        background-color: #d8bfd8;
+    }
+
+#result {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.close-btn {
+    background-color: #ccc;
+    color: black;
+}
+
+    .close-btn:hover {
+        background-color: #999;
+    }
+
+.card-img-top {
+    object-fit: cover;
+    height: 200px; /* Налаштуйте висоту за потребою */
+}
+
+.carousel-item {
+    height: 300px; /* Висота слайду */
+}
+
+/* Додаткові стилі для каруселі "Також рекомендуємо" */
+#recommendedBooksCarousel .card {
+    border: 2px solid #D4C6E7;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+}
+
+#recommendedBooksCarousel .card-img-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px 20px 0 0;
+    min-height: 160px; /* Забезпечує достатньо простору для вертикального зображення */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa; /* Легкий фон для контейнера зображення */
+}
+
+#recommendedBooksCarousel .card-img-top {
+    width: 100px;
+    max-height: 150px;
+    object-fit: contain;
+    display: block;
+}
+
+#recommendedBooksCarousel .card-body {
+    padding: 10px;
+    text-align: center;
+}
+
+#recommendedBooksCarousel .card-title {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #6F42C1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+}
+
+#recommendedBooksCarousel .custom-button {
+    background-color: #B19CD9;
+    color: #fff;
+    border: 2px solid #B19CD9;
+    border-radius: 30px;
+    padding: 5px 15px; /* Зменшено padding для btn-sm */
+}
+
+    #recommendedBooksCarousel .custom-button:hover {
+        background-color: #9358AB;
+        border-color: #9358AB;
+    }
+
+#recommendedBooksCarousel .carousel-control-prev,
+#recommendedBooksCarousel .carousel-control-next {
+    width: 30px;
+    height: 30px;
+    background-color: #B19CD9;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 1;
+}
+
+#recommendedBooksCarousel .carousel-control-prev {
+    left: -15px;
+}
+
+#recommendedBooksCarousel .carousel-control-next {
+    right: -15px;
+}
+
+#recommendedBooksCarousel .carousel-control-prev-icon,
+#recommendedBooksCarousel .carousel-control-next-icon {
+    background-color: transparent; /* Щоб не дублювалися стилі */
+}
+
+/* Стилі для кнопок онлайн-магазинів */
+.btn-online-store {
+    position: relative;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(177, 156, 217, 0.4);
+}
+
+    .btn-online-store:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(177, 156, 217, 0.6);
+    }
+
+/* Стиль для Yakaboo */
+.yakaboo-btn {
+    background: linear-gradient(135deg, #B19CD9 0%, #6F42C1 100%);
+    color: #fff;
+}
+
+    .yakaboo-btn:hover {
+        background: linear-gradient(135deg, #9358AB 0%, #5A2A9D 100%);
+    }
+
+/* Стиль для Rozetka */
+.rozetka-btn {
+    background: linear-gradient(135deg, #D4C6E7 0%, #B19CD9 100%);
+    color: #4b0082;
+}
+
+    .rozetka-btn:hover {
+        background: linear-gradient(135deg, #E5D8FF 0%, #C2A9E0 100%);
+        color: #fff;
+    }
+
+/* Ефект "підсвітки" при наведенні */
+.btn-online-store::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+    z-index: 0;
+}
+
+.btn-online-store:hover::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Забезпечимо, щоб текст залишався поверх ефекту */
+.btn-online-store span {
+    position: relative;
+    z-index: 1;
+}
+
+/* Стилі для інформаційного вікна */
+.bookstore-info-window {
+    font-family: Arial, sans-serif;
+    padding: 10px;
+    background-color: #F4EDFF;
+    border: 2px solid #D4C6E7;
+    border-radius: 10px;
+    max-width: 300px;
+}
+
+    .bookstore-info-window h4 {
+        color: #6F42C1;
+        font-size: 16px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #D4C6E7;
+        padding-bottom: 5px;
+    }
+
+    .bookstore-info-window p {
+        color: #6E6893;
+        font-size: 14px;
+        margin: 5px 0;
+    }
+
+    .bookstore-info-window strong {
+        color: #4b0082;
+    }
+
+.copy-btn {
+    background-color: #B19CD9;
+    color: #fff;
+    border: none;
+    border-radius: 15px;
+    padding: 3px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .copy-btn:hover {
+        background-color: #9358AB;
+    }

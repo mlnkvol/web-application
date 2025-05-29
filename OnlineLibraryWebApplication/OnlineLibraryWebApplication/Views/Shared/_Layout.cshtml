@@ -34,9 +34,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-white @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Authors" ? "active" : "")" asp-area="" asp-controller="Authors" asp-action="Index">Автори</a>
                         </li>
-                        <li class="nav-item">
+                        @* <li class="nav-item">
                             <a class="nav-link text-white @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Possessions" ? "active" : "")" asp-area="" asp-controller="Possessions" asp-action="Index">Моя бібліотека</a>
-                        </li>
+                        </li> *@
                     </ul>
                     <ul class="navbar-nav">
                         @if (User.Identity.IsAuthenticated)

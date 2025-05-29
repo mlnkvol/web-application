@@ -1,95 +1,82 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿$(document).ready(function () {
+    var maxLength = 250;
+    var description = document.getElementById('description');
+    var readMoreBtn = document.getElementById('read-more');
+    var fullText, shortenedText;
 
-// Write your JavaScript code.
-
-var maxLength = 250;
-var description = document.getElementById('book-description');
-var readMoreBtn = document.getElementById('read-more');
-var fullText = description.innerHTML;
-
-if (fullText.length > maxLength) {
-    var shortenedText = fullText.substring(0, maxLength) + '...';
-description.innerHTML = shortenedText;
-readMoreBtn.style.display = 'block';
-} else {
-    readMoreBtn.style.display = 'none';
-}
-
-function toggleDescription() {
-    if (readMoreBtn.innerHTML === 'Читати далі') {
-    description.innerHTML = fullText;
-readMoreBtn.innerHTML = 'Згорнути';
-    } else {
-    description.innerHTML = shortenedText;
-readMoreBtn.innerHTML = 'Читати далі';
+    if (description) {
+        fullText = description.innerHTML;
+        if (fullText.length > maxLength) {
+            shortenedText = fullText.substring(0, maxLength) + '...';
+            description.innerHTML = shortenedText;
+            if (readMoreBtn) {
+                readMoreBtn.style.display = 'inline';
+            }
+        } else {
+            if (readMoreBtn) {
+                readMoreBtn.style.display = 'none';
+            }
+        }
     }
-}
 
-$(document).ready(function () {
+    window.toggleDescription = function () {
+        if (!description || !readMoreBtn) return;
+
+        if (readMoreBtn.innerHTML === 'Читати далі') {
+            description.innerHTML = fullText;
+            readMoreBtn.innerHTML = 'Згорнути';
+        } else {
+            description.innerHTML = shortenedText;
+            readMoreBtn.innerHTML = 'Читати далі';
+        }
+    };
+
+    window.addToLibrary = function (bookTitle) {
+        var bookId = document.getElementById('bookId').value;
+        var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+        if (!bookId || !token) {
+            console.error('bookId або token не знайдені:', { bookId, token });
+            alert('Помилка: не вдалося отримати дані книги або токен.');
+            return;
+        }
+
+        fetch('/Possessions/AddToLibrary', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({ id: bookId }) // Перевірте, чи контролер чекає саме 'id'
+        })
+            .then(response => {
+                console.log('Response status:', response.status); // Логування статусу
+                if (!response.ok) {
+                    throw new Error(`Помилка: ${response.status} - ${response.statusText}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log('Response data:', data); // Логування даних
+                $('#addToLibraryModal').modal('show');
+                $('#modalMessage').html(`Книга <strong>${bookTitle}</strong> успішно додана до <a href="/Possessions/Index">бібліотеки</a>✅`);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(`Сталася помилка при додаванні книги до бібліотеки: ${error.message}`);
+            });
+    };
+
     $(window).scroll(function () {
         var scroll = $(window).scrollTop();
-
         if (scroll >= $(window).height()) {
             $('body').addClass('pastel-background');
         } else {
             $('body').removeClass('pastel-background');
         }
     });
-});
 
-$(document).ready(function () {
     $('#reviewsCarousel').carousel({
         interval: false
     });
 });
-
-function addToLibrary() {
-    var bookId = document.getElementById('bookId').value;
-
-    fetch('/Books/AddToLibrary', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]').value // Якщо ви використовуєте захист від CSRF-атак
-        },
-        body: JSON.stringify({
-            bookId: bookId
-        })
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Виникла помилка: ' + response.status);
-            }
-            return response.json();
-        })
-        .then(data => {
-            alert(data); // Повідомлення про успішне додавання книги до бібліотеки
-        })
-        .catch(error => {
-            console.error('Помилка:', error);
-            alert('Сталася помилка при спробі додати книгу до бібліотеки.');
-        });
-}
-
-
-document.getElementById('exportButton').addEventListener('click', async () => {
-    const format = document.getElementById('exportFormat').value;
-    try {
-        const response = await fetch(`/Books/Export?format=${format}`, { 
-            method: 'GET'
-        });
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `books.${format}`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-    } catch (error) {
-        console.error('Помилка експорту:', error);
-    }
-});
-
-

@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using OnlineLibraryWebApplication.Data.Identity;
 using OnlineLibraryWebApplication.Models;
 using OnlineLibraryWebApplication.Services;
+using System.Security.Cryptography;
 using static System.Reflection.Metadata.BlobBuilder;
 
 namespace OnlineLibraryWebApplication.Controllers
@@ -15,14 +20,48 @@ namespace OnlineLibraryWebApplication.Controllers
     {
         private readonly DblibraryContext _context;
         private readonly IDataPortServiceFactory<Book> _bookDataPortServiceFactory;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public BooksController(DblibraryContext context, IDataPortServiceFactory<Book> bookDataPortServiceFactory)
+        public BooksController(DblibraryContext context, IDataPortServiceFactory<Book> bookDataPortServiceFactory, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _bookDataPortServiceFactory = bookDataPortServiceFactory;
+            _userManager = userManager;
         }
 
-        // GET: Books
+        //// POST: Possessions/AddToLibrary/5
+        //[Authorize]
+        //[HttpPost]
+        //public async Task<IActionResult> AddToLibrary(int id)
+        //{
+        //    // Отримуємо UserId як string
+        //    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+        //        ?? throw new UnauthorizedAccessException("Користувач не авторизований");
+
+        //    // Перевіряємо, чи книга вже є в бібліотеці користувача
+        //    var possession = await _context.Possessions
+        //        .FirstOrDefaultAsync(p => p.UserId == userId && p.BookId == id);
+        //    if (possession != null)
+        //    {
+        //        return BadRequest("Ця книга вже є у вашій бібліотеці.");
+        //    }
+
+        //    // Додаємо нову книгу до бібліотеки
+        //    _context.Possessions.Add(new Possession
+        //    {
+        //        UserId = userId,
+        //        BookId = id,
+        //        StartTime = DateTime.Now,
+        //        Accessibility = 1,
+        //        EndTime = DateTime.Now.AddYears(1),
+        //        CurrentPage = 0
+        //    });
+
+        //    await _context.SaveChangesAsync();
+        //    return Ok("Книга успішно додана до вашої бібліотеки.");
+        //}
+
+        // Решта методів залишається без змін
         public async Task<IActionResult> Index(int? id, string? name, string? filteredBy, string? search)
         {
             IQueryable<Book> books = _context.Books
@@ -34,7 +73,6 @@ namespace OnlineLibraryWebApplication.Controllers
             switch (filteredBy)
             {
                 case "categories":
-                    // Фільтруємо книги за категорією
                     ViewBag.CategoryId = id;
                     ViewBag.CategoryName = name;
                     ViewBag.PageTitle = "Книги за категорією " + ViewBag.CategoryName;
@@ -42,7 +80,6 @@ namespace OnlineLibraryWebApplication.Controllers
                     break;
 
                 case "publishers":
-                    // Фільтруємо книги за видавництвом
                     ViewBag.PublisherId = id;
                     ViewBag.PublisherName = name;
                     ViewBag.PageTitle = "Книги видавництва " + ViewBag.PublisherName;
@@ -50,7 +87,6 @@ namespace OnlineLibraryWebApplication.Controllers
                     break;
 
                 case "genres":
-                    // Фільтруємо книги за жанром
                     ViewBag.GenreId = id;
                     ViewBag.GenreName = name;
                     ViewBag.PageTitle = "Книги за жанром " + ViewBag.GenreName;
@@ -58,7 +94,6 @@ namespace OnlineLibraryWebApplication.Controllers
                     break;
 
                 case "authors":
-                    // Фільтруємо книги за автором
                     ViewBag.AuthorId = id;
                     ViewBag.Author1 = name;
                     ViewBag.PageTitle = "Книги автора " + ViewBag.Author1;
@@ -79,9 +114,6 @@ namespace OnlineLibraryWebApplication.Controllers
             return View(await books.ToListAsync());
         }
 
-
-
-        // GET: Books/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -101,20 +133,30 @@ namespace OnlineLibraryWebApplication.Controllers
             {
                 return NotFound();
             }
+
+            var genreIds = book.Genres?.Select(g => g.Id).ToList() ?? new List<int>();
+            var recommendedBooks = new List<Book>();
+
+            if (genreIds.Any())
+            {
+                recommendedBooks = await _context.Books
+                    .Include(b => b.Genres)
+                    .Where(b => b.Id != id && b.Genres.Any(g => genreIds.Contains(g.Id)))
+                    .Take(5)
+                    .ToListAsync();
+            }
+
+            ViewBag.RecommendedBooks = recommendedBooks;
+
             return View(book);
         }
 
-        // GET: Books/Create
         public IActionResult Create()
         {
             ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "Id");
             return View();
         }
 
-        // POST: Books/Create
-        //
-        // from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Description,PublisherId,PublicationYear,Image")] Book book)
@@ -128,7 +170,6 @@ namespace OnlineLibraryWebApplication.Controllers
             ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "Id", book.PublisherId);
             return View(book);
         }
-
 
         [HttpGet]
         public IActionResult Import()
@@ -174,7 +215,6 @@ namespace OnlineLibraryWebApplication.Controllers
             };
         }
 
-        // GET: Books/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -191,9 +231,6 @@ namespace OnlineLibraryWebApplication.Controllers
             return View(book);
         }
 
-        // POST: Books/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,PublisherId,PublicationYear,Image")] Book book)
@@ -227,7 +264,6 @@ namespace OnlineLibraryWebApplication.Controllers
             return View(book);
         }
 
-        // GET: Books/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -246,7 +282,6 @@ namespace OnlineLibraryWebApplication.Controllers
             return View(book);
         }
 
-        // POST: Books/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -260,6 +295,7 @@ namespace OnlineLibraryWebApplication.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
         private bool BookExists(int id)
         {
             return _context.Books.Any(e => e.Id == id);

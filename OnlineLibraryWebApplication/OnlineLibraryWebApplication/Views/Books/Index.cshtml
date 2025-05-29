@@ -7,9 +7,9 @@
 <h1>@ViewBag.PageTitle</h1>
 
 @*<p>
-    @Html.ActionLink("Додати нову книгу", "Create", new {categoryId = ViewBag.CategoryId})
+    @Html.ActionLink("Додати нову книгу", "Create", new { categoryId = ViewBag.CategoryId })
 </p>
- <table class="table">
+<table class="table">
     <thead>
         <tr>
             <th>
@@ -47,7 +47,7 @@
             </td>
             <td>
                 <a href="@Url.Action("Index", "Books", new { id = item.PublisherId, name = item.PublisherName, filteredBy = "publishers" })">
-                  @item.PublisherName
+                    @item.PublisherName
                 </a>
             </td>
             <td>
@@ -58,7 +58,7 @@
         </tr>
 }
     </tbody>
-</table> *@
+</table>*@
 <form action="@Url.Action("Index")" method="get">
     <div class="input-group mb-3" style="width: 33%;">
         <input type="text" class="form-control rounded-pill" placeholder="Введіть назву книги" name="search" />
@@ -70,13 +70,12 @@
 
 <div>
     <a class="btn btn-primary mb-3" type="submit" asp-area="" asp-controller="Books" asp-action="Import">Завантажити з файлу</a>
-        <a id="exportButton" class="btn btn-primary mb-3" type="submit" asp-area="" asp-controller="Books" asp-action="Export">Експортувати у файл</a>
-        <select id="exportFormat">
-            <option value="xlsx">Excel (xlsx)</option>
-            <option value="pdf">PDF</option>
-        </select>
+    <a id="exportButton" class="btn btn-primary mb-3" type="submit" asp-area="" asp-controller="Books" asp-action="Export">Експортувати у файл</a>
+    <select id="exportFormat">
+        <option value="xlsx">Excel (xlsx)</option>
+        <option value="pdf">PDF</option>
+    </select>
 </div>
-
 
 @foreach (var book in Model)
 {
@@ -142,4 +141,124 @@
             </div>
         </div>
     </div>
+}
+
+<!-- Бічний блок -->
+<div class="sidebar">
+    <h4>Пройди тест та дізнайся, з якою книгою у тебе match!</h4>
+    <button onclick="startQuiz()">Пройти тест</button>
+</div>
+
+<!-- Модальне вікно -->
+<div id="quizModal" class="modal">
+    <div class="modal-content">
+        <h3>Питання <span id="questionNumber">1</span>/10</h3>
+        <p id="questionText"></p>
+        <div id="options">
+            <button class="option-btn" onclick="selectOption(0)">Варіант 1</button>
+            <button class="option-btn" onclick="selectOption(1)">Варіант 2</button>
+            <button class="option-btn" onclick="selectOption(2)">Варіант 3</button>
+            <button class="option-btn" onclick="selectOption(3)">Варіант 4</button>
+        </div>
+        <p id="result" style="display: none;"></p>
+        <button class="close-btn" onclick="closeQuiz()">Закрити</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/json2/20160511/json2.min.js"></script>
+    <script>
+        // Передача книг із серверної частини (Razor)
+        const books = @Html.Raw(Json.Serialize(Model.Select(b => new { id = b.Id, title = b.Title })));
+
+        // Питання та відповіді
+        const questions = [
+            { question: "Який тип пригод тобі до душі?", options: ["Магічні світи", "Детективні розслідування", "Романтичні історії", "Епічні битви"] },
+            { question: "Де ти б хотів опинитися?", options: ["У чарівному лісі", "У великому місті", "На безлюдному острові", "У старовинному замку"] },
+            { question: "Який у тебе настрій?", options: ["Мрійливий", "Серйозний", "Романтичний", "Енергійний"] },
+            { question: "Який жанр фільмів тобі подобається?", options: ["Фентезі", "Трилер", "Мелодрама", "Екшн"] },
+            { question: "Що ти обереш для читання?", options: ["Книгу з магією", "Книгу з таємницями", "Книгу про кохання", "Книгу про війну"] },
+            { question: "Який у тебе характер?", options: ["Мрійник", "Аналітик", "Романтик", "Борець"] },
+            { question: "Що тобі важливіше в книзі?", options: ["Світобудова", "Сюжет", "Персонажі", "Динаміка"] },
+            { question: "Який час доби тобі подобається?", options: ["Ранок", "День", "Вечір", "Ніч"] },
+            { question: "Який колір тобі ближчий?", options: ["Зелений", "Синій", "Рожевий", "Червоний"] },
+            { question: "Що ти цінуєш у героях?", options: ["Мудрість", "Сміливість", "Чутливість", "Сила"] }
+        ];
+
+        let currentQuestion = 0;
+        let answers = [];
+
+        function startQuiz() {
+            currentQuestion = 0;
+            answers = [];
+            document.getElementById("quizModal").style.display = "block";
+            document.getElementById("result").style.display = "none";
+            showQuestion();
+        }
+
+        function showQuestion() {
+            document.getElementById("questionNumber").textContent = currentQuestion + 1;
+            document.getElementById("questionText").textContent = questions[currentQuestion].question;
+            const optionButtons = document.querySelectorAll(".option-btn");
+            for (let i = 0; i < optionButtons.length; i++) {
+                optionButtons[i].textContent = questions[currentQuestion].options[i];
+            }
+        }
+
+        function selectOption(option) {
+            answers.push(option);
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            // Підрахунок відповідей
+            const scores = new Array(books.length).fill(0); // Ініціалізуємо масив для всіх книг
+            for (let i = 0; i < answers.length; i++) {
+                scores[answers[i]]++; // Підраховуємо бали для кожної книги
+            }
+            // Знаходимо тип з найбільшим балом
+            let maxScore = 0;
+            let bookIndex = 0;
+            for (let i = 0; i < scores.length; i++) {
+                if (scores[i] > maxScore) {
+                    maxScore = scores[i];
+                    bookIndex = i;
+                }
+            }
+            // Показуємо результат із текстом
+            document.getElementById("questionText").style.display = "none";
+            document.querySelectorAll(".option-btn").forEach(btn => btn.style.display = "none");
+            document.getElementById("result").style.display = "block";
+            const matchedBook = books[bookIndex];
+            let personalityText = "";
+            switch (bookIndex) {
+                case 0: // Фентезі
+                    personalityText = "Вітаємо! Ти мрійник 🌌, який любить занурюватися у магічні світи ✨! Тобі ідеально підійдуть книги, де поєднано фантазію та пригоди 🗡️, цей жанр — твій маст-хев!";
+                    break;
+                case 1: // Детектив
+                    personalityText = "Вітаємо! Ти аналітик 🕵️‍♂️, який обожнює розгадувати таємниці 🔍! Тобі ідеально підійдуть книги з інтригами та логічними поворотами, ти не можеш жити без адреналіну!";
+                    break;
+                case 2: // Роман
+                    personalityText = "Вітаємо! Ти романтик 💕, який цінує глибокі почуття ❤️! Тобі ідеально підійдуть книги про кохання та емоції, цей жанр — твоя стихія!";
+                    break;
+                case 3: // Екшн
+                    personalityText = "Вітаємо! Ти борець 💪, який любить динаміку та екшн 🔥! Тобі ідеально підійдуть книги з епічними битвами та напругою, ти не можеш жити без адреналіну!";
+                    break;
+                default:
+                    personalityText = "Вітаємо! Ти унікальна особистість 🌟, яка любить різноманітність! Тобі підійдуть книги будь-якого жанру!";
+            }
+            // Формуємо URL на стороні JavaScript
+            const detailsUrl = `/Books/Details/${matchedBook.id}`;
+            document.getElementById("result").innerHTML = `${personalityText}<br>Твій match: <a href="${detailsUrl}">${matchedBook.title}</a>!`;
+        }
+
+        function closeQuiz() {
+            document.getElementById("quizModal").style.display = "none";
+        }
+    </script>
 }

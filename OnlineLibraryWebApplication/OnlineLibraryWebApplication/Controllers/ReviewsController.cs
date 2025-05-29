@@ -172,5 +172,33 @@ namespace OnlineLibraryWebApplication.Controllers
         {
             return _context.Reviews.Any(e => e.Id == id);
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddReview([Bind("UserId,BookId,Rating,Comment")] Review review, string UserName)
+        {
+            if (!ModelState.IsValid)
+            {
+                if (review.Rating < 1 || review.Rating > 5)
+                {
+                    ModelState.AddModelError("Rating", "Оцінка має бути від 1 до 5.");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    ViewData["BookId"] = new SelectList(_context.Books, "Id", "Description", review.BookId);
+                    return View("Create", review);
+                }
+            }
+
+            // Об’єднуємо ім'я з коментарем
+            review.Comment = $"{UserName}: {review.Comment}";
+            review.Date = DateOnly.FromDateTime(DateTime.UtcNow);
+            _context.Add(review);
+            await _context.SaveChangesAsync();
+
+            // Повертаємо на детальну сторінку книги замість Index
+            return RedirectToAction("Details", "Books", new { id = review.BookId });
+        }
     }
+
 }

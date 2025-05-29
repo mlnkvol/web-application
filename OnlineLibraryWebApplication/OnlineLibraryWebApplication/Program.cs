@@ -98,6 +98,11 @@ app.UseEndpoints(endpoints =>
         defaults: new { controller = "Categories" });
 
     endpoints.MapControllerRoute(
+        name: "reviews",
+        pattern: "reviews/{action=Index}/{id?}",
+        defaults: new { controller = "Reviews" });
+
+    endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller=Categories}/{action=Index}/{id?}");
 
@@ -115,6 +120,7 @@ app.UseEndpoints(endpoints =>
         name: "authors",
         pattern: "{action=Index}/{id?}",
         defaults: new { controller = "Authors" });
+
 });
 
 app.Run();

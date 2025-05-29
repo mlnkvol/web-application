@@ -10,6 +10,7 @@ public partial class Category: Entity
     public int Id { get; set; }
 
     [Required(ErrorMessage = "Поле не повинно бути порожнім")]
+    [StringLength(60)]
     [Display(Name ="Категорія")]
     public string CategoryName { get; set; } = null!;
 
